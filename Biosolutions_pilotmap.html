@@ -1,0 +1,3316 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Testfaciliteter i Danmark</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+:root{
+  --bg:#f0f4f8;--panel:#fff;--text:#1e293b;--muted:#64748b;
+  --border:#e2e8f0;--r:10px;--shadow:0 2px 14px rgba(0,0,0,.09);
+  --accent:#1a56db;--accent-l:#e8f0fe;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* HEADER */
+header{background:var(--panel);border-bottom:1px solid var(--border);padding:0 18px;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:var(--shadow);z-index:1000;flex-shrink:0;gap:12px}
+.hbrand{display:flex;align-items:center;gap:10px}
+.hlogo-wrap{width:32px;height:32px;border-radius:8px;overflow:hidden;background:#f1f5f9;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hlogo-wrap img{width:100%;height:100%;object-fit:contain}
+.htitle{font-size:14px;font-weight:700;letter-spacing:-.2px;white-space:nowrap}
+.hsub{font-size:10.5px;color:var(--muted)}
+.hright{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.badge{background:var(--accent-l);color:var(--accent);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.lang-btn{display:flex;background:#f1f5f9;border-radius:20px;overflow:hidden;border:1px solid var(--border)}
+.lang-opt{padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s;user-select:none;border:none;background:none}
+.lang-opt.active{background:var(--accent);color:#fff}
+
+/* LAYOUT */
+.app{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:292px;background:var(--panel);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sidebar-top{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+
+/* search */
+.sw{position:relative}
+.sw input{width:100%;padding:7px 9px 7px 30px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:12.5px;color:var(--text);background:var(--bg);outline:none;transition:border .2s}
+.sw input:focus{border-color:var(--accent);background:#fff}
+.sw .si{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;pointer-events:none}
+
+/* filter */
+.fsec{display:flex;flex-direction:column;gap:4px}
+.flabel{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:3px}
+.chip{display:flex;align-items:center;gap:3px;padding:3px 8px;border-radius:12px;font-size:10.5px;
+  font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);
+  color:var(--muted);transition:all .15s;user-select:none;white-space:nowrap}
+.chip.on{background:#fff;border-color:currentColor}
+.cdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sel{width:100%;padding:5px 7px;border:1.5px solid var(--border);border-radius:7px;
+  font-size:11.5px;color:var(--text);background:var(--bg);outline:none;cursor:pointer}
+
+/* list */
+.rinfo{padding:6px 12px 2px;font-size:10.5px;color:var(--muted);flex-shrink:0}
+.flist{flex:1;overflow-y:auto;padding:4px 8px 10px}
+
+/* card */
+.fcard{padding:9px 10px;border-radius:8px;border:1.5px solid var(--border);
+  margin-bottom:6px;cursor:pointer;transition:all .15s;background:#fff}
+.fcard:hover,.fcard.active{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-l)}
+.fc-row1{display:flex;align-items:center;gap:8px}
+.fc-logo{width:36px;height:24px;border-radius:4px;overflow:hidden;background:#f8fafc;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--border)}
+.fc-logo img{width:100%;height:100%;object-fit:contain}
+.fc-logo-fb{font-size:8px;font-weight:800;color:#64748b;text-align:center;line-height:1.1}
+.fc-right{flex:1;min-width:0}
+.fc-org{font-size:11.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-name{font-size:10.5px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-bottom{display:flex;gap:4px;margin-top:5px;align-items:center;flex-wrap:wrap}
+.fc-city{font-size:10px;color:var(--muted)}
+.fc-tag{font-size:9.5px;padding:1.5px 5px;border-radius:6px;font-weight:600}
+.fc-tpill{font-size:9px;padding:1.5px 5px;border-radius:6px;border:1px solid;font-weight:600}
+
+/* MAP */
+.map-wrap{position:relative;flex:1;overflow:hidden}
+#map{width:100%;height:100%}
+
+/* TOOLTIP (hover) */
+.map-tooltip{
+  background:#fff;border-radius:10px;padding:10px 12px;
+  box-shadow:0 6px 24px rgba(0,0,0,.18);border:1px solid var(--border);
+  min-width:200px;max-width:260px;pointer-events:none;
+}
+.tt-logo-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tt-logo{width:52px;height:32px;border-radius:5px;overflow:hidden;background:#f8fafc;
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tt-logo img{width:100%;height:100%;object-fit:contain}
+.tt-logo-fb{font-size:9px;font-weight:800;color:#64748b}
+.tt-org{font-size:12px;font-weight:700;color:var(--text);line-height:1.3}
+.tt-name{font-size:10.5px;color:var(--muted);line-height:1.3}
+.tt-city{font-size:10px;color:var(--muted);margin-top:4px}
+
+/* DETAIL PANEL */
+.dp{position:absolute;top:0;right:0;bottom:0;width:390px;background:#fff;
+  border-left:1px solid var(--border);box-shadow:-4px 0 24px rgba(0,0,0,.12);
+  display:flex;flex-direction:column;transform:translateX(100%);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:400;overflow:hidden}
+.dp.open{transform:translateX(0)}
+
+.dp-header{flex-shrink:0;padding:14px 16px 12px;border-bottom:1px solid var(--border)}
+.dp-close{float:right;background:none;border:none;font-size:18px;color:var(--muted);
+  cursor:pointer;line-height:1;padding:0 2px;margin-left:8px}
+.dp-close:hover{color:var(--text)}
+.dp-logo-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.dp-logo{width:72px;height:44px;border-radius:6px;overflow:hidden;background:#f8fafc;
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dp-logo img{width:100%;height:100%;object-fit:contain}
+.dp-logo-fb{font-size:11px;font-weight:800;color:#64748b}
+.dp-org-name{font-size:15px;font-weight:700;line-height:1.3}
+.dp-fac-name{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4;padding-right:28px}
+.dp-meta-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.dp-badge{font-size:10px;padding:2px 8px;border-radius:7px;font-weight:500}
+
+.dp-body{flex:1;overflow-y:auto;padding:13px 15px}
+.dps{margin-bottom:16px}
+.dps-title{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.dps-desc{font-size:12.5px;color:#475569;line-height:1.65}
+.trl-grid{display:flex;flex-wrap:wrap;gap:4px}
+.trl-chip{padding:4px 10px;border-radius:16px;font-size:10.5px;font-weight:600;border:1.5px solid}
+
+/* service table grouped */
+.svc-group{margin-bottom:10px}
+.svc-group-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:#94a3b8;padding:4px 6px;background:#f8fafc;border-radius:4px;margin-bottom:3px}
+.svc-table{width:100%;border-collapse:collapse;font-size:11.5px}
+.svc-table th{text-align:left;padding:4px 7px;background:var(--bg);color:var(--muted);
+  font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border)}
+.svc-table td{padding:5px 7px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text)}
+.svc-table tr:last-child td{border-bottom:none}
+.svc-table tr:hover td{background:var(--bg)}
+.atex-badge{background:#d1fae5;color:#065f46;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700}
+
+.ap-row{display:flex;gap:6px;flex-wrap:wrap}
+.ap-yes{background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 9px;border-radius:7px}
+.ap-no{background:#fee2e2;color:#991b1b;font-size:11px;font-weight:600;padding:3px 9px;border-radius:7px}
+.ap-note{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+
+.cg{display:flex;flex-direction:column;gap:4px}
+.crow{font-size:11.5px;display:flex;align-items:flex-start;gap:6px}
+.crow a{color:var(--accent);text-decoration:none}
+.crow a:hover{text-decoration:underline}
+.ci{font-size:12px;flex-shrink:0;margin-top:1px}
+
+/* LEGEND */
+.legend{position:absolute;bottom:20px;right:12px;z-index:399;background:#fff;border-radius:10px;
+  padding:9px 11px;box-shadow:var(--shadow);font-size:10px;border:1px solid var(--border);
+  max-width:170px;pointer-events:none}
+.lt{font-weight:700;margin-bottom:5px;color:var(--muted);text-transform:uppercase;
+  font-size:8.5px;letter-spacing:.5px}
+.li{display:flex;align-items:center;gap:5px;margin-bottom:3px;color:var(--text)}
+.ldot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* POPUP override */
+.leaflet-popup-content-wrapper{border-radius:12px!important;box-shadow:0 8px 28px rgba(0,0,0,.16)!important;
+  padding:0!important;overflow:hidden;border:none!important}
+.leaflet-popup-content{margin:0!important;width:272px!important}
+.pu-bar{height:4px;width:100%}
+.pu-body{padding:11px 13px}
+.pu-logo-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.pu-logo{width:52px;height:32px;border-radius:5px;overflow:hidden;background:#f8fafc;
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pu-logo img{width:100%;height:100%;object-fit:contain}
+.pu-logo-fb{font-size:9px;font-weight:800;color:#64748b}
+.pu-org{font-size:13px;font-weight:700;color:var(--text);line-height:1.3}
+.pu-name{font-size:10.5px;color:var(--muted);margin-top:1px;line-height:1.3}
+.pu-trls{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:7px}
+.pu-trl{font-size:9px;padding:2px 5px;border-radius:5px;font-weight:600}
+.pu-btn{display:block;text-align:center;padding:7px;background:var(--accent);color:#fff;
+  border:none;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;
+  width:100%;transition:background .15s}
+.pu-btn:hover{background:#1447c0}
+
+/* scrollbar */
+.flist::-webkit-scrollbar,.dp-body::-webkit-scrollbar{width:3px}
+.flist::-webkit-scrollbar-thumb,.dp-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+
+/* empty */
+.empty{text-align:center;padding:32px 14px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hbrand">
+    <div class="hlogo-wrap">
+      <img src="https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogoer+300x150-13-FoodBioCluster.png&width=200&format=webp"
+           onerror="this.style.display='none';this.parentElement.innerHTML='🔬'" alt="FBC"/>
+    </div>
+    <div>
+      <div class="htitle" data-da="Testfaciliteter i Danmark" data-en="Test Facilities in Denmark">Testfaciliteter i Danmark</div>
+      <div class="hsub" data-da="Biosolutions &amp; Fødevarer · Interaktivt kort" data-en="Biosolutions &amp; Food · Interactive map">Biosolutions &amp; Fødevarer · Interaktivt kort</div>
+    </div>
+  </div>
+  <div class="hright">
+    <span class="badge" id="total-badge">35 faciliteter</span>
+    <div class="lang-btn">
+      <button class="lang-opt active" id="lang-da" onclick="setLang('da')">DA</button>
+      <button class="lang-opt" id="lang-en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</header>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-top">
+      <div class="sw">
+        <span class="si">🔍</span>
+        <input type="text" id="search" data-placeholder-da="Søg navn, by, service…" data-placeholder-en="Search name, city, service…" placeholder="Søg navn, by, service…"/>
+      </div>
+      <div class="fsec">
+        <span class="flabel" data-da="By" data-en="City">By</span>
+        <select class="sel" id="city-filter">
+          <option value="" data-da="Alle byer" data-en="All cities">Alle byer</option>
+        </select>
+      </div>
+      <div class="fsec">
+        <span class="flabel" data-da="TRL-niveau" data-en="TRL Level">TRL-niveau</span>
+        <div class="chips" id="trl-chips"></div>
+      </div>
+      <div class="fsec">
+        <span class="flabel" data-da="Service / Udstyr" data-en="Service / Equipment">Service / Udstyr</span>
+        <select class="sel" id="svc-cat-filter">
+          <option value="" data-da="Alle kategorier" data-en="All categories">Alle kategorier</option>
+        </select>
+      </div>
+    </div>
+    <div class="rinfo" id="rinfo"></div>
+    <div class="flist" id="flist"></div>
+  </div>
+
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div class="dp" id="dp">
+      <div class="dp-header" id="dp-header"></div>
+      <div class="dp-body" id="dp-body"></div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+</div>
+
+<script>
+const FACILITIES = [
+  {
+    "id": 1,
+    "org": "21st.BIO A/S",
+    "name": "21st.BIO Pilot Plant",
+    "abbr": "21st.BIO",
+    "city": "Søborg",
+    "address": "Sydmarken 42, 2860 Søborg",
+    "lat": 55.732044,
+    "lng": 12.507023,
+    "phone": "+45 93830938",
+    "contact": "Rasmus Rune Hansen, Director of Client Development & Project Management",
+    "mail": "r.runehansen@21st.bio",
+    "url": "https://21st.bio/",
+    "color": "#1a56db",
+    "textColor": "#ffffff",
+    "logo": "https://logo.clearbit.com/21st.bio",
+    "logoFallback": "21st.BIO",
+    "description": "Ideen bag anlægget er end nedskaleret præcisionsfermentering fabrik. Alle processer skal videst muligt ligne stor-skala processer. Gæringskapacitet ligger på 2x 30L, 2x300L og 2x 1200L. Særligt fokus på ekspression af proteiner til nutrition, landbrug og materialer.",
+    "trls": [
+      "Screening (TRL 2-5)",
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)",
+      "Kommerciel (TRL 9)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet",
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "Vi er dd ikke fødevaregodkendt, men forventer en godkendelse i løbet af 2. kvartal.",
+    "gmo_approved": false,
+    "gmo_desc": "Vi er dd ikke godkendt til GMO, men har ansøgt og forventer en godkendelse i næste uge til klasse 1 organismer.",
+    "services": [
+      {
+        "service": "Fermentation",
+        "antal": "2",
+        "beskrivelse": "",
+        "kapacitet": "30 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "2",
+        "beskrivelse": "",
+        "kapacitet": "300 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "2",
+        "beskrivelse": "",
+        "kapacitet": "1200 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Membrane filtration",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Micro filtration",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Shake flasks",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "UHT treatment",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "org": "Absalon Centre of Engineering & Science (CES)",
+    "name": "ABSALONS FERMENTERINGSPLATFORM - TDU FACILITET I HJERTET AF BIOTEKBYEN KALUNDBORG",
+    "abbr": "ABSALON",
+    "city": "Kalundborg",
+    "address": "Campus Kalundborg 4, 4400 Kalundborg",
+    "lat": 55.680833,
+    "lng": 11.091111,
+    "phone": "72482119",
+    "contact": "Conni Edith Simonsen, Centerchef for Engineering and Science",
+    "mail": "cosi@pha.dk",
+    "url": "https://phabsalon.dk/samarbejde/virksomhedssamarbejde-med-ingenioeruddannelserne",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogo-medlemmer%2fAbsalon.jpg&width=300&format=webp",
+    "logoFallback": "ABSALON",
+    "description": "In our molecular biology lab we can do PCR, qPCR, DNA extrations and quantification, and DNA sequencing.\nin regard to transformation we can do electroporation and have LAF-benches",
+    "trls": [
+      "Screening (TRL 2-5)"
+    ],
+    "skalas": [],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": true,
+    "gmo_desc": "We are approved for GMO 1 work. So fransformations of Escherichia coli and Lactobacillus sp. laboratory strains",
+    "services": []
+  },
+  {
+    "id": 3,
+    "org": "AU-FOOD",
+    "name": "AU-FOOD: Differentiated & Biofunctional Food",
+    "abbr": "AU-FOOD",
+    "city": "Aarhus N",
+    "address": "Agro Food Park 48, 8200 Aarhus N",
+    "lat": 56.196133,
+    "lng": 10.183467,
+    "phone": "22307518",
+    "contact": "Professor, Science Team Leader Jette Feveile Young",
+    "mail": "jettef.young@food.au.dk",
+    "url": "Differentiated & Biofunctional Foods (au.dk)",
+    "color": "#1a56db",
+    "textColor": "#ffffff",
+    "logo": "https://logo.clearbit.com/au.dk",
+    "logoFallback": "AU-FOOD",
+    "description": "The teams' key objectives is to develop innovative, sustainable and healthy food concepts that prioritize the green transition, quality and nutritional value. With a focus on developing sustainable animal-based foods, including cultivated meat and alternative protein sources, and the incorporation of bioactive plant components. With the long-term focus of reducing environmental impact and improving consumer health and satisfaction.\n\nThe team has animal cell culture laboratories, GMO accredited labs, molecular analysis platforms for mRNA, miRNA and protein laboratory, histochemical laboratory, NMR and metabolomics facility, plant food quality and biomarker facility.",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": true,
+    "gmo_desc": "Only basic level",
+    "services": []
+  },
+  {
+    "id": 4,
+    "org": "AU-FOOD",
+    "name": "AU-FOOD: Food Chemistry",
+    "abbr": "AU-FOOD",
+    "city": "Aarhus N",
+    "address": "Agro Food Park 48, 8200 Aarhus N",
+    "lat": 56.196133,
+    "lng": 10.183467,
+    "phone": "22124179",
+    "contact": "Associate professor, Science Team Leader Lars Wiking",
+    "mail": "lars.wiking@food.au.dk",
+    "url": "Food Chemistry (au.dk)",
+    "color": "#1a56db",
+    "textColor": "#ffffff",
+    "logo": "https://logo.clearbit.com/au.dk",
+    "logoFallback": "AU-FOOD",
+    "description": "The teams' key objective is to conduct research on food chemistry, covering micro and macro-nutrients, and develop innovative solutions for sustainable food production, processing, and biorefinery. Delivering expertise in food quality and shelf-life, valorization of sides streams, plant proteins, biorefinery of green and blue raw materials, climate-friendly dairy production, while prioritizing application and development of state-of-the-art analytical techniques and optimization of processes.\n\nThe team has lab and pilot processing facilities, include micro- and ultrafiltration units, homogenizer, equipment for high intensity ultrasound, a pilot dairy plant and UHT-DSI.  State-of-the-art analytical facilities aligned to these areas include static and dynamic light scattering (DLS), analytical and preparative chromatographic techniques, 1D and 2D gel electrophoresis, fluorescence spectroscopy, confocal microscopy, texture analysis, tensiometry, rheometry, differential scanning calorimetry (DSC) and potentiometric titration. Our research infrastructure consist of a large range of cutting-edge mass spectrometry (MS) and chromatography instruments such as, NanoLC- TimsToF Pro, 2D LC-ESI/Q-ToF MS/MS with ion mobility, LC-ESI/MS triple Q, and, ICP-MS.",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 5,
+    "org": "AU-FOOD",
+    "name": "AU-FOOD: Food Quality, Perception & Society",
+    "abbr": "AU-FOOD",
+    "city": "Aarhus N",
+    "address": "Agro Food Park 48, 8200 Aarhus N",
+    "lat": 56.196133,
+    "lng": 10.183467,
+    "phone": "28782840",
+    "contact": "Professor, Science Team Leader Derek V. Byrne",
+    "mail": "derekv.byrne@food.au.dk",
+    "url": "Food Quality Perception & Society (au.dk)",
+    "color": "#1a56db",
+    "textColor": "#ffffff",
+    "logo": "https://logo.clearbit.com/au.dk",
+    "logoFallback": "AU-FOOD",
+    "description": "The teams' key objective is to innovate in food, ingredients and diets by understanding human perception and food choices, fostering sustainable and healthier food experiences through interdisciplinary research and collaboration. To enhance consumer acceptance of novel products, food-related satisfaction, and address behavioural aspects pertinent to contemporary consumption patterns, underpinning the green transition and delivering high impact systemic solutions via public engagement actions and Living Labs.\n\nThe teams iSense Lab has sensory and consumer perception laboratories, which includes sensory laboratory, discussion room, behaviour laboratory, preparatory laboratory and in situ eating evaluation facilities. Multisensory and biometrics instrumentation laboratory including, olfactory, gustatory VR, EEG and audio capabilities for fundamental sensory and cross-modal response measurement.",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)",
+      "Fuld (TRL 8)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet",
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 6,
+    "org": "AU-FOOD",
+    "name": "AU-FOOD: Food Technology",
+    "abbr": "AU-FOOD",
+    "city": "Aarhus N",
+    "address": "Agro Food Park 48, 8200 Aarhus N",
+    "lat": 56.196133,
+    "lng": 10.183467,
+    "phone": "22169259",
+    "contact": "Professor, Science Team Leader Marianne Hammershøj",
+    "mail": "marianne.hammershoj@food.au.dk",
+    "url": "Food Technology (au.dk)",
+    "color": "#1a56db",
+    "textColor": "#ffffff",
+    "logo": "https://logo.clearbit.com/au.dk",
+    "logoFallback": "AU-FOOD",
+    "description": "The teams' key objective is to conduct research on technologies in the food chain impacting the nutritional quality, functionality, and sustainability of food by advancing the understanding of the chemical and physical properties of food and ingredients. Delivering expertise in the properties of, and interactions of, food components and complexes. Including optimizing food pro-cessing, developing sustainable packaging solutions, and postharvest quality of plant-based foods.\n\nThe team has state-of-the-art analytical facilities aligned to these areas are Light scattering, analytical and preparative Size Exclusion Chromatography, a large range of Mass Spectrometry (MS) instruments, e.g. MS techniques for metabolome analyses, ultrasensitive gas analysis, Fourier transformed infrared spectroscopy (FT-IR), fluorescence spectroscopy, confocal microscopy, texture analysis, tensiometry, rheometry, Differential Scanning Calorimetry (DSC), potentiometric titration, multispectral analysis for visual quality, microbiology techniques, and advanced postharvest storage.\n\nLaboratory and pilot processing facilities include micro- and ultrafiltration units, a pilot dairy plant, laboratory and pilot twin-screw co-rotating extruders, laboratory and pilot scale extruders equipped with cooling die for plant-based food developments, homogenizer, equipment for high intensity ultrasound, spray dryer, UHT-DSI, and laboratories for development and characterization of food packaging materials. We have state-of the-art storage rooms to simulate different environmental storage conditions for studies of quality of fresh fruit and vegetables, dairy, and other perishable foods, and portable equipment to monitor T and RH, and capture volatile organic compounds.",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": true,
+    "gmo_desc": "Biohazard level 1 of micorbiology laboratory.",
+    "services": []
+  },
+  {
+    "id": 7,
+    "org": "AU-FOOD",
+    "name": "AU-FOOD: Plant, Food and Sustainability",
+    "abbr": "AU-FOOD",
+    "city": "Aarhus N",
+    "address": "Agro Food Park 48, 8200 Aarhus N",
+    "lat": 56.196133,
+    "lng": 10.183467,
+    "phone": "20 85 77 95",
+    "contact": "Tenure Track Mesfin Tsegaye Gebremikael",
+    "mail": "mesfin.gebremikael@food.au.dk",
+    "url": "Plant, Food & Sustainability (au.dk)",
+    "color": "#1a56db",
+    "textColor": "#ffffff",
+    "logo": "https://logo.clearbit.com/au.dk",
+    "logoFallback": "AU-FOOD",
+    "description": "The teams' key objectives are: 1. To conduct science with a clear societal mission in sustainable open-field horticultural production, focusing on the development of new solutions that reduce the impact on the environment and climate. To contribute to the green transition of agriculture through the sustainable production of plant-based foods, including fruits, vegetables, legumes, cereals, plant physiology, abiotic stresses, cropping systems, soil fertility, plant nutrition, drought, light and biosolutions (e.g. biostimulants, compost, valorization of waste streams). 2. To conduct research that is focused on resilience and food security, optimizes resource efficiency in closed (protected) agriculture environments (CEAs). To address the challenges posed by climate change and climate extremes, with a focus on the impact of multiple stresses in crops, on plant productivity and quality while minimizing environmental impact.\n\nThe team has facilities for field based production of fruits, vegetables and legumes which includes field organic and conventional farming experimental facilities (38 ha), fruit and berry orchard, Nordic vegetative germplasm collection, root and soil analysis facilities, vegetable and fruit handling facilities, cold storage facilities, specialized post-harvest facilities, plant physiology and specialized quality assessment labs. Facilities for protected plant production and climate research laboratories, which includes greenhouse production facility, photosynthesis laboratory, phenotyping facility, climate chamber facilities, multilayer growing rooms, plant tissue culture, outdoor container area for plant growth, plant physiology and specialized quality assessment laboratories, microscopy and plant imaging facilities.",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": true,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 8,
+    "org": "Ausumgaard",
+    "name": "Ausumgaard bioraffineringsanlæg til grønne biomasser",
+    "abbr": "Ausumgaard",
+    "city": "Hjerm",
+    "address": "Holstebrovej 101, 7560 Hjerm",
+    "lat": 56.527778,
+    "lng": 8.561111,
+    "phone": "4597464411",
+    "contact": "Maria eller Kristian Lundgaard-Karlshøj",
+    "mail": "kontor@ausumgaard.dk",
+    "url": "https://ausumgaard.dk",
+    "color": "#16a34a",
+    "textColor": "#ffffff",
+    "logo": "https://logo.clearbit.com/ausumgaard.dk",
+    "logoFallback": "Ausumgaard",
+    "description": "Ausumgaard råder over et fuldskala bioraffineringsanlæg til behandling af græs, kløver og andre grønne biomasser. Anlægget består af modtagefaciliteter, presning af biomassen, separereing af proteiner fra saften og udfældning af proteinernen som en pasta. Pastaen tørres på et eksternt anlæg i Skive. Anlægget har en kapacitet på mere end 10 tons biomasse pr. time. Anlægget anvendes af Ausumgaard selv og brunsaften og pressekagen fra den første presning anvendes i selskabets eget biogasanlæg, hvilket bidrager væsentligt til rentabiliteten. Ausumgaard har etableret selskavet Green Biorefine som etablere tilsvarende faciliteter som turnkey leverancer. de forventer selv at etablere et nyt og større anlæg i løbet af de kommende år, hvorefet de nuveærende faciliteter forventes at kunne stilles til rådighed for test og afprøvning for andre som er interesseret.\nBioraffineringsanlægget har været i drift i mere end tre år, og der er stor erfaring med drift af fuldskala faciliteter på anlægget.\n\nOBS: Anlægget kan ikke pt. anvendes af eksterne. Det afventer opførelse af nyt anlæg.",
+    "trls": [
+      "Screening (TRL 2-5)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)",
+      "Kommerciel (TRL 9)"
+    ],
+    "skalas": [
+      "Demonstrationsfacilitet",
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": [
+      {
+        "service": "Asfalteret plads",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Logistik & Infrastruktur"
+      },
+      {
+        "service": "Centrifugering",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Decanter",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Gummiged",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Logistik & Infrastruktur"
+      },
+      {
+        "service": "Lastbil",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Logistik & Infrastruktur"
+      },
+      {
+        "service": "Skruepresse",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "10 tons/time",
+        "atex": "",
+        "category": "Bioraffinering & Ekstraktion"
+      },
+      {
+        "service": "Snegl",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Bioraffinering & Ekstraktion"
+      },
+      {
+        "service": "Syreproces",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Bioraffinering & Ekstraktion"
+      },
+      {
+        "service": "Varmeproces",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Varmeveksling",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Vaskeproces",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Bioraffinering & Ekstraktion"
+      },
+      {
+        "service": "Lager",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Logistik & Infrastruktur"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "org": "Bioneer A/S",
+    "name": "Fermentation and enzyme process development",
+    "abbr": "Bioneer",
+    "city": "Hørsholm",
+    "address": "Kogle Allé 2, 2970 Hørsholm",
+    "lat": 55.874922,
+    "lng": 12.508278,
+    "phone": "45160444",
+    "contact": "Kontaktperson for faciliteten",
+    "mail": "ccl@bioneer.dk",
+    "url": "https://bioneer.dk/",
+    "color": "#4b5563",
+    "textColor": "#ffffff",
+    "logo": "https://logo.clearbit.com/bioneer.dk",
+    "logoFallback": "Bioneer",
+    "description": "Bioneer has 40 years of experience in expressing enzymes and proteins via microbial fermentation at various scales. We have teams covering the whole development process from genetic engineering, strain development, product expression and finally to purification and characterization by a large range of different technologies. Furthermore we also develop enzymatic assays to test functionality etc of the expressed product. In terms of down stream processes our experienced protein/enzyme purification teams have solid experience in developing purificatopn processes of various enzymes and proteins. We work primarily with E.coli and  Lactococcus lactis as expression hosts. Our scale is from small 50 ml to 15L fermentations.",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)",
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)",
+      "Kommerciel (TRL 9)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": true,
+    "gmo_desc": "Bioneer approved GMO facilities. We can work with projects in the class 1 and class 2 catagories",
+    "services": [
+      {
+        "service": "Fermentation",
+        "antal": "6",
+        "beskrivelse": "1 L culture volume glass bioreactors, batch and fed-batch processes established",
+        "kapacitet": "1L/24-72 hours",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "1",
+        "beskrivelse": "15 L culture volume stainless steel bioreactor",
+        "kapacitet": "15L/24-72 hours",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Freeze drying",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Homogeniser",
+        "antal": "2",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Blanding & Homogenisering"
+      },
+      {
+        "service": "Shake flasks",
+        "antal": "30",
+        "beskrivelse": "Different formats and capacity",
+        "kapacitet": "50 ml - 3L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Spectroscopy",
+        "antal": "2",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Analyse & Spektroskopi"
+      },
+      {
+        "service": "Ion exchange chromatography",
+        "antal": "2",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Rheological analysis",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Analyse & Spektroskopi"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "org": "FermHub Zealand",
+    "name": "",
+    "abbr": "FermHub Zealand",
+    "city": "Gørlev",
+    "address": "Algade 2D, 4281 Gørlev",
+    "lat": 55.534167,
+    "lng": 11.231389,
+    "phone": "26377070",
+    "contact": "Lulu Harms",
+    "mail": "Lulu Harms Larsen <luluharms@muscatec.dk>  Christian Kjølby <ckjoelby@naturembioscience.com>; Christopher Jensen <ckjensen@naturembioscience.com>",
+    "url": "https://www.linkedin.com/company/fermhub-zealand/",
+    "color": "#0ea5e9",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fBiosolutions+-+ressourcer%2fFermhub+Zealand+300x150+pxl.png&width=300&format=webp",
+    "logoFallback": "FermHub Zealand",
+    "description": "Nyt dansk center for fødevare-fermentering etableres i Kalundborg kommune\nVi opbygger en komplet ”state of the art” industriel bio-fermenteringsfacilitet til fremstilling af nye fødevarer ved fermentering.\nVi skaber en dansk ”centre of excellence” teknologiplatform for viden og udvikling af bio-fermenteringsprocesser og -produktion.",
+    "trls": [
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": [
+      {
+        "service": "Fermentation",
+        "antal": "2",
+        "beskrivelse": "",
+        "kapacitet": "30 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "2",
+        "beskrivelse": "",
+        "kapacitet": "300 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "2",
+        "beskrivelse": "",
+        "kapacitet": "1200 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Membrane filtration",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Micro filtration",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Shake flasks",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "UHT treatment",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "org": "RUC",
+    "name": "OpenBioLab",
+    "abbr": "RUC",
+    "city": "Roskilde",
+    "address": "Universitetsvej 1, 4000 Roskilde",
+    "lat": 55.65444,
+    "lng": 12.13778,
+    "phone": "+45 4674 3920",
+    "contact": "Frederik Diness",
+    "mail": "openbiolab@ruc.dk",
+    "url": "https://ruc.dk/openbiolab",
+    "color": "#15803d",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogo-medlemmer%2fRUC+300x150.jpg&width=300&format=webp",
+    "logoFallback": "RUC",
+    "description": "OpenBioLab har fokus på virksomheder, der arbejder med udvikling af produkter baseret på plantebaserede råvarer, f.eks. fødevarer, fødevareingredienser eller produkter som udnytter sidestrømme fra produktion af fødevarer. OpenBioLab kan give mulighed for adgang til analyser og data, som understøtter f.eks. kvalitetskontrol, udvikling af nye produkter eller bedre udnyttelse af sidestrømme og dermed værdiforøgelse i den samlede proces hos virksomheden. Virksomheder kan få hjælp af studerende til f.eks.: \n    Indledende karakterisering af råvarer (f.eks. proteinindhold)\n    Karakterisering af prøver udtaget under fremstilling for at følge proces analytisk\n    Analyse af sidestrømme og deres potentielle værdifulde indholdsstoffer\n    Undersøgelse af enzymbaserede processer\n    Karakterisering af fermenteringsprocesser\nLaboratoriet er er en del af erhvervsfyrtårnet Biosolutions Zealand og understøtter visionen om, at Danmark skal være et globalt fyrtårn inden for biosolutions. OpenBioLab bidrager til virksomheders konkurrenceevne ved at udvikle og opskalere bioteknologiske produkter gennem kvalitetsdata og styrke samarbejdet med studerende og dermed tiltrække kvalificeret arbejdskraft. OpenBioLab focuses on companies that work with the development of products based on plant-based raw materials, e.g. food, food ingredients or products that utilise side streams from the production of food. OpenBioLab provides access to analyses and data that support e.g. quality control, development of new products or better utilisation of side streams, thereby gaining added value in the overall process at the company. Companies can have assistance from students with, for example:\n    Initial characterisation of raw materials (e.g. protein content)\n    Characterisation of samples taken during manufacture in order to follow the process analytically\n    Analysis of side streams and their potential valuable constituents\n    Exploration of enzyme-based processes\n    Characterisation of fermentation processes\nThe laboratory is part of the Lighthouse Project for Biosolutions Zealand and supports the vision that Denmark should be a global beacon within biosolutions. OpenBioLab contributes to companies' competitiveness by developing and upscaling biotechnological products through quality data and strengthening collaboration with students and thus attracting qualified future employees.",
+    "trls": [],
+    "skalas": [],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": [
+      {
+        "service": "Inddamper til prøver",
+        "antal": "1",
+        "beskrivelse": "Automated Sample Preparator (Evaporation, concentration and (re)dissolving. Up to 16 samples) \nV10-2SC. V10 Touch System with Solvent manager and Automation",
+        "kapacitet": "1 - 16 prøver\n4 - 100 ml",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Frysetørrer til prøver",
+        "antal": "1",
+        "beskrivelse": "Freeze Drier\nCoolSafe 95-15 Pro",
+        "kapacitet": "Op til 1 liter",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Kuglemølle til prøver",
+        "antal": "1",
+        "beskrivelse": "Ball mill for sample homoganisation\nMixer Mill MM400",
+        "kapacitet": "1 - 25 gram",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Spektroskopi",
+        "antal": "1",
+        "beskrivelse": "Spectrophotometer\nV-770 UV-Visible/NIR Spectrophotometer cuvette based",
+        "kapacitet": "Enkelt kuvette",
+        "atex": "",
+        "category": "Analyse & Spektroskopi"
+      },
+      {
+        "service": "Mikrotitterplade læser",
+        "antal": "1",
+        "beskrivelse": "Multi-mode microplate reader\nSpectraMax i3x",
+        "kapacitet": "Enkelt plade",
+        "atex": "",
+        "category": "Analyse & Spektroskopi"
+      },
+      {
+        "service": "Analytisk vådkromatografi",
+        "antal": "1",
+        "beskrivelse": "Combined liquid chromatography and a mass spectroscopy system including a UV detector. Shimadzu Nexera\nAnalytisk HPLC - MS",
+        "kapacitet": "96 prøve autosampler + mikrotitter",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Infrarød spektroskopi",
+        "antal": "1",
+        "beskrivelse": "Multi-mode infrared spectroscopy instrument\nCary 630 FTIR",
+        "kapacitet": "Enkelt prøve",
+        "atex": "",
+        "category": "Analyse & Spektroskopi"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "org": "Technical University of Denmark (DTU)",
+    "name": "Chemical engineering, Pilot Plant",
+    "abbr": "DTU",
+    "city": "Kgs. Lyngby",
+    "address": "Søltofts Plads 228A, 2800 Kgs. Lyngby",
+    "lat": 55.786111,
+    "lng": 12.523889,
+    "phone": "",
+    "contact": "",
+    "mail": "",
+    "url": "https://www.kt.dtu.dk/research/pilot-plant",
+    "color": "#0ea5e9",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogo-medlemmer%2fDTU+300x150.jpg&width=300&format=webp",
+    "logoFallback": "DTU",
+    "description": "At PILOT PLANT we focus on unit operations, reaction engineering, process control, process and plant design, instrumentation, automation and industrial measuring technology, but also topics such as scale-up and scale-down and batch versus continuous processes. Special focus areas are fermentation mainly from a process point-of-view, but also innovative technology and particle technology.\n\nOur research\nOur research is conducted within plant and process technology, equipment design, Process Analytical Technology (PAT) automation and instrumentation and construction materials in close collaboration with industrial partners. Our technical expertise include:\n\nDesigning and building large scale plants (engineering, construction)\nUnit operations (theory and practice)\nIndustrial chemical processes (design complete process)\nOperational experience (solving practical process problems)\nProject management\nDesign of experiments\nPlant safety\nGood Manufacturing Practice (GMP)",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)",
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet",
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "We have the permission to operate with GMO at lab scale (less than 15 L) as well as at pilot scale (larger than 15 L)",
+    "services": [
+      {
+        "service": "Destillation",
+        "antal": "1",
+        "beskrivelse": "Distillation in bubble-cap tray column (Continues): It includes a steam-heated boiler. The vapours from the boiler enter the column below tray no. 9.The column is about 2 m high, has a diameter of 15 cm, 3 bubble-caps and a down-comer on each tray together with a sample valve and a resistance element detecting the temperature of the vapour leaving the tray. The vapour leaving tray 1 is condensed by cooling water and all the condensate returned to the condensate pump.",
+        "kapacitet": "Boiler size: 300 liter. \nSize of distillation column: 2 m high x Ø20 cm.",
+        "atex": "Zone 0",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Destillation",
+        "antal": "1",
+        "beskrivelse": "Batch Distillation: . It includes a steam-heated boiler T1 (100 liter) which contains the initial water/alcohol mixture.\nOn top of the boiler (=still) is the column, made in glass tubes of diameter 10 cm. The column is filled with a structured packing called Mellapak 250Y. The height of the packing is 1.68 m.\nSample valves and temperature elements are placed at the top, at the middle and at the bottom of the column. The vapors leaving the column are condensed in the glass heat exchanger HE1 using cold city  water, and all the condensate is transfered to the pump P1. The plant is controlled manually, but the temperatures and the steam flow are recorded on the LabView datalogging system on the computer.",
+        "kapacitet": "Boiler size: 100 liter. \nSize of distillation column: 1.68 m high x Ø10 cm.",
+        "atex": "Zone 0",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Agitator tank",
+        "antal": "1",
+        "beskrivelse": "Agitation: The unit consists of an open cylindrical PVC vessel, filled to a certain level with water. It is stirred from the top using either conventional impeller mixers or rotating jet heads. Various chemicals can be added, and the response on conductivity or pH is recorded. Also air can be added in terms of bubbles for aeration studies and the oxygen concentration recorded. For rotating jet heads or CIP nozzles the circulation pump is used.",
+        "kapacitet": "Ø930 mm x 1500 mm, open cylinder made of PVC",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Hydrocyclone",
+        "antal": "1",
+        "beskrivelse": "Hydrocyclones Separation: The core of the plant is a battery of hydrocyclones U2 with space for up to14 cyclones. In the experiment only 4 cyclones are used. They are made of nylon and is approximately 1 cm in diameter and 9 cm in length. The hydrocyclones are fed by a centrifugal multistage pump P1 from a 200 liter vessel T1 with a stirrer U1, and the separated fractions (overflow and underflow) can be returned to the feed vessel. The pump speed can be adjusted from a frequency converter. Flowmeters and pressure indicator are manually recorded; there is no data logging.",
+        "kapacitet": "T1 200 L",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Evaporator",
+        "antal": "1",
+        "beskrivelse": "Falling Film Evaporation: consists mainly of the evaporator unit with the calandria pipe section, the condenser, a plate heat exchanger for preheating of the feed, the feed pump and the product/recirculation pump. The plant is mounted on a frame for mobility. All components in feed/product contact are made of stainless steel or plastic. The plant can be operated under moderate vacuum as well as at moderate over-pressure.",
+        "kapacitet": "Nominal evaporation capacity: 100 liter water/h at ΔT = 20 C, using steam",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Ultra filtration",
+        "antal": "1",
+        "beskrivelse": "Ultrafiltration: is a batch operated pilot plant UF system from Alfa Laval (previously\nDanish Separation Systems) with two different types of membrane design,",
+        "kapacitet": "50 L - flat sheet plate-and frame module type 38 and a spiral wound membrane\ntype GR81PP",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Reverse osmosis",
+        "antal": "1",
+        "beskrivelse": "Desalination By Reverse Osmosis: consists of a high-pressure pump, an RO-membrane made as a spiral wound module, a vessel with agitator and some instrumentation.",
+        "kapacitet": "The membrane is, PERMAQ1-4040 from BWT with an area of 7.9 m2 and a minimum NaCl retention of 99.3%. The length is 925 mm, the diameter 89 mm and the spacer thickness is 0.34 mm.  maximum operating temperature: 45 C.",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Ion exchange chromatography",
+        "antal": "1",
+        "beskrivelse": "Ion exchange: The fixed bed reactor is the main component. It is a glass cylinder equipped with a water jacket. The resin to be used is Amberjet 1200 from Röhm & Haas, originally on Na-form but converted to H-form. Amberjets are based on styrene-divinylbenzene resins with sulphonate as functional group.",
+        "kapacitet": "Reactor = 8 liter\nT1 = 100 liter",
+        "atex": "Zone 1",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Spray drying",
+        "antal": "1",
+        "beskrivelse": "Spray drier: is a commercial pilot plant equipment called “Production Minor” and made by Niro A/S (today GEA Niro). The dryer can be operated with a rotating atomizer (operating range 15000-24000 rpm) or a 2-fluid atomizing nozzle.",
+        "kapacitet": "1.21 m3",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Membrane filtration",
+        "antal": "1",
+        "beskrivelse": "Membrane Separation By A Vibrating Ultrafiltration Unit: The patented Vibro™ technology makes the membrane module vibrate vertically while the media inside the module is stationary. The relative vibration of media and membrane creates turbulence on the membrane surface and thereby should keep fouling tendency of the membrane at a minimum.",
+        "kapacitet": "The unit utilizes 3 modules of the 2.5 m2 Free Flow Plate™ module type, in total 7,5m2 membrane area. a stainless-steel Feed / CIP: 50 liters",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Centrifugation",
+        "antal": "1",
+        "beskrivelse": "Centrifugation : is a GEA Pathfinder 5 disk stack centrifuge type FSC 5-06-177. The centrifuge is equipped with a self-cleaning disk type bowl.",
+        "kapacitet": "100-200 liter/h",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "1",
+        "beskrivelse": "Fermentation: made by The Biostat®and is an advanced modern designed fermentation system developed using state of the art cultivation technologies. For trouble-free operation only high quality industrial components are used.\nAll possible product contact (wetted stainless steel) components are made of stainless steel AISI 316L with\na surface roughness of Ra <= 0.8 μm.\nThree subsystems comprise every Biostat® D-DCU:\n- Control Tower with integrated gas mixing and pump module\n- Culture vessel with bottom agitation system\n- The Supply Unit includes open-frame compact stainless steel piping module\nThe system includes a CIP unit that is operated by the same controll tower with the fermenter",
+        "kapacitet": "200 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "1",
+        "beskrivelse": "Fermentation: made by The Biostat®and is an advanced modern designed fermentation system developed using state of the art cultivation technologies. For trouble-free operation only high quality industrial components are used.\nAll possible product contact (wetted stainless steel) components are made of stainless steel AISI 316L with\na surface roughness of Ra <= 0.8 μm.",
+        "kapacitet": "100 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "2",
+        "beskrivelse": "Fermentation: made by The Biostat®and is an advanced modern designed fermentation system developed using state of the art cultivation technologies. For trouble-free operation only high quality industrial components are used.\nAll possible product contact (wetted stainless steel) components are made of stainless steel AISI 316L with\na surface roughness of Ra <= 0.8 μm.\nThree subsystems comprise every Biostat® D-DCU:\n- Control Tower with integrated gas mixing and pump module\n- Culture vessel with bottom agitation system\n- The Supply Unit includes open-frame compact stainless steel piping module",
+        "kapacitet": "50 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "2",
+        "beskrivelse": "Fermentation: made by The Biostat®and is an advanced modern designed fermentation system developed using state of the art cultivation technologies. For trouble-free operation only high quality industrial components are used.\nAll possible product contact (wetted stainless steel) components are made of stainless steel AISI 316L with\na surface roughness of Ra <= 0.8 μm.",
+        "kapacitet": "15 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "4",
+        "beskrivelse": "Fermentation: is customizable small-scale fermentation. The base unit of a Biostream Biobench reactor contains basically all hardware, wiring and electricity. It is the heart of the reactor and may contain many components like mass flow controllers, off-gas analysers, valves and rotameters. The headplate is fitted on the vessel and contains all necessary ports for sensors, additions etc. The headplate is made of stainless steel.",
+        "kapacitet": "5 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Autoclaving",
+        "antal": "1",
+        "beskrivelse": "Autoclave: The main component is a vertical Autoclave with one major tray for goods to be sterilised.",
+        "kapacitet": "602 L",
+        "atex": "",
+        "category": "Analyse & Spektroskopi"
+      },
+      {
+        "service": "Extraction",
+        "antal": "1",
+        "beskrivelse": "Liquid-Liquid Extraction: consists of 4 glass vessels each 100 liter: One for feed, one for solvent , one for raffinate and one for extract . From vessel Feed and Solvent two piston pumps with variable drive transport the feed and solvent to the mixer-settler unit, where the extraction takes place",
+        "kapacitet": "4 glass vessels each 100 L\nMixer-settler unit 1.63 L",
+        "atex": "",
+        "category": "Bioraffinering & Ekstraktion"
+      },
+      {
+        "service": "Extraction",
+        "antal": "1",
+        "beskrivelse": "Solid-Liquid Extraction: Consists of a  cylindrical glass vessel T1 where liquid for extraction can be heated to the prescribed temperature by an electrical heating element. The hot liquid is then by gravity fed to the extractor T2, which is also a glass vessel. T2 has also a heating element (split into 3 separate units) in order to be able to maintain a certain extraction temperature.",
+        "kapacitet": "T1 and T2 = 20 liter \nT3 =  80 liter and T4 = 100 liter",
+        "atex": "",
+        "category": "Bioraffinering & Ekstraktion"
+      },
+      {
+        "service": "Column",
+        "antal": "1",
+        "beskrivelse": "Absorption in packed columns:The main component is the absorber column; a 3.7 m high glass tube with 1.9 m effective absorption height. To make sure no ammonia gas is released to the environment, a small post absorber column is installed before the exhaust. A third column in the set-up is the air humidifier, which function is to saturate the inlet air to the absorber.",
+        "kapacitet": "Main absorber column: 3.7 m high glass tube with 1.9 m effective absorption height. Diameter: 10 cm.",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Crystallization",
+        "antal": "1",
+        "beskrivelse": "Crystallization: The main components are the boiler (crystallizer), a vessel for semi-concentrated feed, the condenser and the vacuum pump, a liquid flow loop with a circulation pump and the control board.",
+        "kapacitet": "U1, Boiler:  300 liter\nU2, Storage: 550 liter",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Tunnel Drying",
+        "antal": "1",
+        "beskrivelse": "Drying in a tunnel: A modified Armfield Tray Drier It consists of a horizontal squared air duct. Air is sucked into the duct by an axial flow fan impeller with variable speed. The maximum air velocity in the duct is appr. 1.5 m/sec. The air passes through an electrical heater with power control to provide an adjustment in air temperature up to a maximum of  80oC at low air velocities.\nIn the downstream end of the dryer there is a support frame mounted inside the duct, which can hold up to four metal trays for the product to be dried.",
+        "kapacitet": "Tunnel dryer 50 - 80 C0",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Filteration",
+        "antal": "1",
+        "beskrivelse": "Filter Press: T1 is a stirred vessel (~ 300 liters) used for making the suspension. The pump P1 pumps the suspension to the filter press F1, from which the effluent is collected in the vessel T2. The total weight of T2 is continuously measured by a scale WT1 (accuracy 0.05 kg). \nCirculation of the suspension through valve V4 and the vessel agitator can keep the suspension homogenous. There is no data logging, and the plant is operated fully manually.",
+        "kapacitet": "T1: 300 liter (150 liter water)",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Filteration",
+        "antal": "1",
+        "beskrivelse": "Drum filtration: The plant consists of the filter drum with cell division on the surface and covered by a polypropylene filter cloth. The 12 cells are connected to suction pipes which assemble inside the drum in a central manifold connected to the vacuum pump. To remove the filter cake two systems are available: A knife and a roller system.",
+        "kapacitet": "Drum: Ø 0.5 m, filter area 0.5 m2.\nVessel T1: 220 liter\nVessel T2: max 50 liter",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Drying",
+        "antal": "1",
+        "beskrivelse": "Fluidized Bed Drying: The fluidized bed\nitself consists of two sections – the bed and the freeboard. Between the bed and freeboard is a conical\nexpansion in stainless steel. In the bottom of the bed is a stainless-steel air distributor plate located in the top part of the windbox, which is a steel tube supplied with a flange in the bottom for discharge of bed material. Compressed air for fluidization is heated in an electrical air heater before passing into the windbox.",
+        "kapacitet": "the bed and the freeboard – made of QVF glass Øi = 100 mm and Øi\n= 150 mm respectively and each 500 mm in length.",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Buffer Tank",
+        "antal": "1",
+        "beskrivelse": "Buffer Tank",
+        "kapacitet": "100 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Buffer Tank",
+        "antal": "1",
+        "beskrivelse": "Buffer Tank",
+        "kapacitet": "250 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Buffer Tank",
+        "antal": "1",
+        "beskrivelse": "Buffer Tank",
+        "kapacitet": "300 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Filteration",
+        "antal": "1",
+        "beskrivelse": "Candle Filtration:  is a suitable Solid/Liquid Separation unit operation for the Pharma and Biotech Industry as the system is specifically designed for cleaning and sterilization in place (CIP and SIP), which in addition of beeing a closed system is a requirement for\npharmaceuticals and to work with genetically modified organisms (GMO).\nFiltration occurs by pushing the suspension containing the solids through the filter element (candle covered with the filter cloth), which is placed inside a pressure chamber.\nBoth the liquid (filtrate) phase as well as the solid phase can be recovered for further processing. The filter cake formed on the candle can be further processed within the system, which includes washing, drying with air as well as deactivation with steam before it can be harvested by a reverse gas flow pressure shock.",
+        "kapacitet": "Volume: approx. 40 L Filter area: 0.26 m2\nNumber of Filter candles: 1\nType of Filter candle: Steribac® Design pressure: 10 barg\nDesign Temperature: 140°C",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Reactor",
+        "antal": "1",
+        "beskrivelse": "PARR reactor: This reactor is available with an FKM O-ring seal for operating temperatures to 225 °C, and FFKM O-ring for temperatures to 300 °C, or with a flat, PTFE gasket for operating temperatures up to 350 °C maximum.",
+        "kapacitet": "Approximate Volume: 7.99 L  Maximum Pressure: 131 bar",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Homogeniser",
+        "antal": "1",
+        "beskrivelse": "Homogenizer: This GEA Mechanical Equipment  homogenizer consists of a positive-displacement piston pump, equipped with automatic suction and delivery spring-operated valves, and a homogenizing\nsection connected to it in which the product undergoes a high-pressure micronization process to reduce the size of the particles suspended in the fluid and achieve homogeneous dimensional distribution.\nThis process can be applied to a large range of products, with various viscosity, and makes it possible to obtain greater product stability through particle dispersion and micronization, depending on the pressure applied.",
+        "kapacitet": "MAX Flow Rate: 50 L/h                    MAX Viscosity: 500-3000 cP          MAX Working Pressure: 1500 bar",
+        "atex": "",
+        "category": "Blanding & Homogenisering"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "org": "Technical University of Denmark (DTU)",
+    "name": "Biosustain, Pre-Pilot Plant",
+    "abbr": "DTU",
+    "city": "Lyngby",
+    "address": "Søltofts Plads, 2800 Lyngby",
+    "lat": 55.786111,
+    "lng": 12.523889,
+    "phone": "+45 93 51 08 27",
+    "contact": "Ann Dorrit Enevoldsen - Manager",
+    "mail": "aden@dtu.dk",
+    "url": "https://www.biosustain.dtu.dk/innovation/ppp",
+    "color": "#0ea5e9",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogo-medlemmer%2fDTU+300x150.jpg&width=300&format=webp",
+    "logoFallback": "DTU",
+    "description": "The pre-pilot plant is a translational unit that scales up biobased production processes developed in the laboratory (200 ml) to pilot scale (100 L). We are a multipurpose facility that covers fermentation, downstream processing, and analytics. There is a wide range of possibilities for downstream development, from cell separation to purification and final product formulation. We have experience working with E. coli and yeast. Our capacity extends up to 100 L. Additionally, we have expertise in the development of production processes for small molecules and proteins, including the production of chemicals, food additives, and pharmaceuticals.",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)",
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": true,
+    "gmo_desc": "Vi er godkendt til GMO1 - vi fortrækker at arbejde med organismer som ikke danner spore.",
+    "services": [
+      {
+        "service": "Frysetørrer til prøver",
+        "antal": "1",
+        "beskrivelse": "små prøver",
+        "kapacitet": "max 100 ml",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Adsorptionskromatografi",
+        "antal": "1",
+        "beskrivelse": "pilot model",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Affinitetskromatografi",
+        "antal": "1",
+        "beskrivelse": "Äkta system",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Autoklavering",
+        "antal": "2",
+        "beskrivelse": "",
+        "kapacitet": "up to 20L",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Centrifugering",
+        "antal": "3",
+        "beskrivelse": "lab, bench top og pilot",
+        "kapacitet": "up to 50 L",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "many",
+        "beskrivelse": "36xambr (250ml), 1L, 5L, 2x30L og 100 L",
+        "kapacitet": "up til 100L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fordamper",
+        "antal": "1",
+        "beskrivelse": "pilot model",
+        "kapacitet": "up til 10 L",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Frysetørring",
+        "antal": "1",
+        "beskrivelse": "pilot model",
+        "kapacitet": "up til 8 kg",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Homogenisator",
+        "antal": "1",
+        "beskrivelse": "bench top",
+        "kapacitet": "100 ml-10 L",
+        "atex": "",
+        "category": "Blanding & Homogenisering"
+      },
+      {
+        "service": "Ionbytningskromatografi",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Membranfiltrering",
+        "antal": "4",
+        "beskrivelse": "forskellige modeller fra lab til pilot",
+        "kapacitet": "max 30 L pr.  Batch",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Mikrofiltering (MF)",
+        "antal": "4",
+        "beskrivelse": "forskellige modeller fra lab til pilot",
+        "kapacitet": "max 30 L pr.  Batch",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Nanofiltrering (NF)",
+        "antal": "2",
+        "beskrivelse": "lab of pilot model",
+        "kapacitet": "max 30 L pr. batch",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Omrørertank",
+        "antal": "1",
+        "beskrivelse": "omrøring of opvarming til max 100C",
+        "kapacitet": "100 L",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Rystekolber",
+        "antal": "2",
+        "beskrivelse": "inkubator til rystekolber samt TOK skaker",
+        "kapacitet": "6x200 L flasker i hver",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Spraytørring",
+        "antal": "1",
+        "beskrivelse": "Gea Niro",
+        "kapacitet": "1-15 L pr. dag",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Ultrafiltrering (UF)",
+        "antal": "3",
+        "beskrivelse": "forskellige modeller fra lab til pilot",
+        "kapacitet": "max 30 L pr.  Batch",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Inddamper til prøver",
+        "antal": "1",
+        "beskrivelse": "Buchi",
+        "kapacitet": "100 ml-1 L",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Datavisualisering",
+        "antal": "",
+        "beskrivelse": "Forskelligt værktøj afhængig af proces",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Dataanalyse"
+      },
+      {
+        "service": "Gassammensætning og koncentration",
+        "antal": "",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Analytisk vådkromatografi",
+        "antal": "4",
+        "beskrivelse": "HPLC",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Analytisk gaskromatografi",
+        "antal": "1",
+        "beskrivelse": "GC-MS",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Filtrering"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "org": "Teknologisk Institut",
+    "name": "Biosolutions Technology center",
+    "abbr": "TI",
+    "city": "Taastrup",
+    "address": "Gregersensvej 1, 2630 Taastrup",
+    "lat": 55.653056,
+    "lng": 12.298611,
+    "phone": "72202000",
+    "contact": "Anne Christine S. Hastrup, Director, Centerchef for Biosolutions Technology Center",
+    "mail": "Biotech@dti.dk, acha@dti.dk",
+    "url": "https://www.teknologisk.dk/laboratorier/bioraffinering/38704?cms.query=PILOTANL%C6G",
+    "color": "#1e293b",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogo-medlemmer%2fTeknologisk+institut+300x150.jpg&width=300&format=webp",
+    "logoFallback": "TI",
+    "description": "Nyt dansk center for fødevare-fermentering etableres i Kalundborg kommune\nVi opbygger en komplet ”state of the art” industriel bio-fermenteringsfacilitet til fremstilling af nye fødevarer ved fermentering.\nVi skaber en dansk ”centre of excellence” teknologiplatform for viden og udvikling af bio-fermenteringsprocesser og -produktion.",
+    "trls": [
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 15,
+    "org": "Teknologisk Institut",
+    "name": "Bioraffineringsanlæg / Biorefining, hydrolysis (incl. Enzymatic), extraction, separation and drying",
+    "abbr": "TI",
+    "city": "Taastrup",
+    "address": "Gregersensvej 1, 2630 Taastrup",
+    "lat": 55.653056,
+    "lng": 12.298611,
+    "phone": "72202000",
+    "contact": "Anne Christine S. Hastrup, Director, Centerchef for Biosolutions Technology Center",
+    "mail": "Biotech@dti.dk, acha@dti.dk",
+    "url": "https://www.teknologisk.dk/laboratorier/bioraffinering/38704?cms.query=PILOTANL%C6G",
+    "color": "#1e293b",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogo-medlemmer%2fTeknologisk+institut+300x150.jpg&width=300&format=webp",
+    "logoFallback": "TI",
+    "description": "Nyt dansk center for fødevare-fermentering etableres i Kalundborg kommune\nVi opbygger en komplet ”state of the art” industriel bio-fermenteringsfacilitet til fremstilling af nye fødevarer ved fermentering.\nVi skaber en dansk ”centre of excellence” teknologiplatform for viden og udvikling af bio-fermenteringsprocesser og -produktion.",
+    "trls": [
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": [
+      {
+        "service": "Omrørertank",
+        "antal": "2",
+        "beskrivelse": "0 - 50 rpm. Heating and cooling possible. Stirring suitable for both liquids and viscous suspensions. pH monitoring and adjustment. Load cell for weighing contents.",
+        "kapacitet": "100 - 800 liter",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Membranfiltrering",
+        "antal": "1",
+        "beskrivelse": "Spiralmembran (MF - UF - NF - RO). Mikrofiltrering, Ultrafiltrering, nanofiltrering og Omvendt osmose. Minimum 70 liter arbejdsvolumen",
+        "kapacitet": "1000 liter/time",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Membranfiltrering",
+        "antal": "1",
+        "beskrivelse": "Keramiske membraner (MF, UF), Mulighed for NF og DF på spiralmembran. Mikrofiltrering og Ultrafiltrering - DF=Diafiltrering. Keramiske membraner skal steriliseres med damp. Min volumen 15 liter",
+        "kapacitet": "100-500 liter/time",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Decanter",
+        "antal": "1",
+        "beskrivelse": "Dekanter - 2-fase. Solids-liquid separation by density.",
+        "kapacitet": "1000 liter/time",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Spraytørring",
+        "antal": "1",
+        "beskrivelse": "Drying of final powdered product from solutions. Internal or external spraying nozzle and heated air for gentle drying process. Other nozzle systems (e.g. rotary atomizer) can be installed. Cyclone and bag filter catches particles.",
+        "kapacitet": "5 - 10 liter/time",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Skruepresse",
+        "antal": "1",
+        "beskrivelse": "Presse væske ud af biomasse. Væske og biomasse kan opsamles og viderforarbejdes.",
+        "kapacitet": "Min batch størrelse 50 kg",
+        "atex": "",
+        "category": "Bioraffinering & Ekstraktion"
+      },
+      {
+        "service": "Vådmølle",
+        "antal": "1",
+        "beskrivelse": "Colloidal and disc mills are available for milling of slurries and suspended solids. Can be used in combination with reactor tanks for continuous processing.",
+        "kapacitet": "op til 800 liter/time",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Centrifuge",
+        "antal": "1",
+        "beskrivelse": "Separation og klarificering og klarificering, opkoncentrering, multifunktionel centrifuge - 3-fase.",
+        "kapacitet": "Op til 3000 liter/time",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Centrifuge",
+        "antal": "1",
+        "beskrivelse": "Separation og klarificering - 3-fase.",
+        "kapacitet": "500 liter/time",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Rystesigte",
+        "antal": "1",
+        "beskrivelse": "Separation af tørstof. 100 µm - 500 µm.",
+        "kapacitet": "op til 1000 liter/time afhængig af fibre",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Homogenisator",
+        "antal": "1",
+        "beskrivelse": "It is well suited to a variety of applications including ultra high pressure (op til 1500 bar / 21.750 psi) or severe duty applications . The design enables many products to be processed and the modular construction provides flexibility. Modular hygienic design consisting of a 3-piece valve housing and 3 5 individual cylinders. Produkttemperatur når 95°C",
+        "kapacitet": "Op til 500 liter/time",
+        "atex": "",
+        "category": "Blanding & Homogenisering"
+      },
+      {
+        "service": "Varmeveksling",
+        "antal": "1",
+        "beskrivelse": "Liquids can be heated directly in heat exchanger. Contents in reactor tanks can be heated with steam from heat exchanger. Pasteurization and sterilization. Enzyme activation/inactivation. Bleaching. Heat precipitation. Rørvarmeveksler",
+        "kapacitet": "Variabel",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Kromatografi",
+        "antal": "1",
+        "beskrivelse": "Separation of soluble components by different binding affinity to chromatography packing (e.g. resin beads). Useful for separation of similar sizes molecules where membrane separation is not possible. Finer components (pigments, phenolics, proteins, aromaer). Lavtrykskromatografi",
+        "kapacitet": "Variabel",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Bæltetørring",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Diskraffineringsmaskine",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Membranfiltrering",
+        "antal": "1",
+        "beskrivelse": "Vibrationsfiltrering velegnet viskøse væsker, fibrer og olier, MF og UF",
+        "kapacitet": "Min volumen 25 liter",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Omrørertank",
+        "antal": "1",
+        "beskrivelse": "Multitank, kan steriliseres, ATEX godkendte, kan bruges til reaktioner og primitive fermenteringer, kan køre anaerobt (N2 purging)",
+        "kapacitet": "100 liter",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Omrørertank",
+        "antal": "3",
+        "beskrivelse": "Multitank, kan steriliseres, ATEX godkendte, kan bruges til reaktioner og primitive fermenteringer, kan køre anaerobt (N2 purging)",
+        "kapacitet": "500 liter",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Omrørertank",
+        "antal": "2",
+        "beskrivelse": "0 - 50 rpm. Heating and cooling possible. Stirring suitable for both liquids and viscous suspensions. pH monitoring and adjustment. Load cell for weighing contents.",
+        "kapacitet": "100 - 800 liter",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Membranfiltrering",
+        "antal": "1",
+        "beskrivelse": "Spiralmembran (MF - UF - NF - RO). Mikrofiltrering, Ultrafiltrering, nanofiltrering og Omvendt osmose. Minimum 70 liter arbejdsvolumen",
+        "kapacitet": "1000 liter/time",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Membranfiltrering",
+        "antal": "1",
+        "beskrivelse": "Keramiske membraner (MF, UF), Mulighed for NF og DF på spiralmembran. Mikrofiltrering og Ultrafiltrering - DF=Diafiltrering. Keramiske membraner skal steriliseres med damp. Min volumen 15 liter",
+        "kapacitet": "100-500 liter/time",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Decanter",
+        "antal": "1",
+        "beskrivelse": "Dekanter - 2-fase. Solids-liquid separation by density.",
+        "kapacitet": "1000 liter/time",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Spraytørring",
+        "antal": "1",
+        "beskrivelse": "Drying of final powdered product from solutions. Internal or external spraying nozzle and heated air for gentle drying process. Other nozzle systems (e.g. rotary atomizer) can be installed. Cyclone and bag filter catches particles.",
+        "kapacitet": "5 - 10 liter/time",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Skruepresse",
+        "antal": "1",
+        "beskrivelse": "Presse væske ud af biomasse som græs, eller oil ud af biomasse som insekter og oliefrø. Væske/olie og biomasse kan opsamles og viderforarbejdes.",
+        "kapacitet": "Min batch størrelse 50 kg",
+        "atex": "",
+        "category": "Bioraffinering & Ekstraktion"
+      },
+      {
+        "service": "Vådmølle",
+        "antal": "1",
+        "beskrivelse": "Colloidal and disc mills are available for milling of slurries and suspended solids. Can be used in combination with reactor tanks for continuous processing.",
+        "kapacitet": "op til 800 liter/time",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Centrifuge",
+        "antal": "1",
+        "beskrivelse": "Separation og klarificering og klarificering, opkoncentrering, multifunktionel centrifuge - 3-fase.",
+        "kapacitet": "Op til 3000 liter/time",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Centrifuge",
+        "antal": "1",
+        "beskrivelse": "Separation og klarificering - 3-fase.",
+        "kapacitet": "500 liter/time",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Rystesigte",
+        "antal": "1",
+        "beskrivelse": "Separation af tørstof. 100 µm - 500 µm.",
+        "kapacitet": "op til 1000 liter/time afhængig af fibre",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Homogenisator",
+        "antal": "1",
+        "beskrivelse": "It is well suited to a variety of applications including ultra high pressure (op til 1500 bar / 21.750 psi) or severe duty applications . The design enables many products to be processed and the modular construction provides flexibility. Modular hygienic design consisting of a 3-piece valve housing and 3 5 individual cylinders. Produkttemperatur når 95°C",
+        "kapacitet": "Op til 500 liter/time",
+        "atex": "",
+        "category": "Blanding & Homogenisering"
+      },
+      {
+        "service": "Varmeveksling",
+        "antal": "1",
+        "beskrivelse": "Liquids can be heated directly in heat exchanger. Contents in reactor tanks can be heated with steam from heat exchanger. Pasteurization and sterilization. Enzyme activation/inactivation. Bleaching. Heat precipitation. Rørvarmeveksler",
+        "kapacitet": "Variabel",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Kromatografi",
+        "antal": "1",
+        "beskrivelse": "Separation of soluble components by different binding affinity to chromatography packing (e.g. resin beads). Useful for separation of similar sizes molecules where membrane separation is not possible. Finer components (pigments, phenolics, proteins, aromaer). Lavtrykskromatografi",
+        "kapacitet": "Variabel",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Bæltetørring",
+        "antal": "1",
+        "beskrivelse": "Tørretumbleren er designet specielt til testtørring og mindre produkter. Tørrekammeret er udstyret med tre inspektionssektion, hvor man kan se produktet hele vejen igennem tørretumbleren.",
+        "kapacitet": "50 kg/time",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Diskraffineringsmaskine",
+        "antal": "1",
+        "beskrivelse": "Refining of lignocellulosic material to obtain fibers suitable for packaging, composites, textile applications, among others",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Membranfiltrering",
+        "antal": "1",
+        "beskrivelse": "Vibrationsfiltrering velegnet viskøse væsker, fibrer og olier, MF og UF",
+        "kapacitet": "Min volumen 25 liter",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Omrørertank",
+        "antal": "1",
+        "beskrivelse": "Multitank, kan steriliseres, ATEX godkendte, kan bruges til reaktioner og primitive fermenteringer, kan køre anaerobt (N2 purging)",
+        "kapacitet": "100 liter",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Omrørertank",
+        "antal": "3",
+        "beskrivelse": "Multitank, kan steriliseres, ATEX godkendte, kan bruges til reaktioner og primitive fermenteringer, kan køre anaerobt (N2 purging)",
+        "kapacitet": "500 liter",
+        "atex": "",
+        "category": "Andet"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "org": "Teknologisk Institut",
+    "name": "Fermenteringsanlæg, Biomass and precision fermentation, food grade",
+    "abbr": "TI",
+    "city": "Taastrup",
+    "address": "Gregersensvej 1, 2630 Taastrup",
+    "lat": 55.653056,
+    "lng": 12.298611,
+    "phone": "72202000",
+    "contact": "Anne Christine S. Hastrup, Director, Centerchef for Biosolutions Technology Center",
+    "mail": "Biotech@dti.dk; acha@dti.dk; ante@dti.dk",
+    "url": "https://www.teknologisk.dk/ydelser/laboratorie-og-pilotfaciliteter-biofermentering/45015",
+    "color": "#1e293b",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogo-medlemmer%2fTeknologisk+institut+300x150.jpg&width=300&format=webp",
+    "logoFallback": "TI",
+    "description": "Nyt dansk center for fødevare-fermentering etableres i Kalundborg kommune\nVi opbygger en komplet ”state of the art” industriel bio-fermenteringsfacilitet til fremstilling af nye fødevarer ved fermentering.\nVi skaber en dansk ”centre of excellence” teknologiplatform for viden og udvikling af bio-fermenteringsprocesser og -produktion.",
+    "trls": [
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": [
+      {
+        "service": "Fermentor",
+        "antal": "4",
+        "beskrivelse": "Bakterier, mikroalger, gær, svampe, fager. Der kan styres efter temperatur, pH, opløst ilt, skum, mass flow controller (gas flow ind og mix af gas), mulighed for omrøring",
+        "kapacitet": "400 ml - 700 ml",
+        "atex": "Zone 2",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentor",
+        "antal": "1",
+        "beskrivelse": "Bakterier, mikroalger, gær, svampe, fager. Der kan styres efter temperatur, pH, opløst ilt, skum, mass flow controller (gas flow ind og mix af gas), mulighed for omrøring",
+        "kapacitet": "8 liter - 28 liter",
+        "atex": "Zone 2",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentor",
+        "antal": "1",
+        "beskrivelse": "Bakterier, mikroalger, gær, svampe, fager. Der kan styres efter temperatur, pH, opløst ilt, skum, mass flow controller (gas flow ind og mix af gas), mulighed for omrøring",
+        "kapacitet": "50 liter - 225 liter",
+        "atex": "Zone 2",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentor",
+        "antal": "1",
+        "beskrivelse": "Bakterier, mikroalger, gær, svampe, fager. Der kan styres efter temperatur, pH, opløst ilt, skum, mass flow controller (gas flow ind og mix af gas), mulighed for omrøring",
+        "kapacitet": "500 liter - 2250 liter",
+        "atex": "Zone 2",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentor",
+        "antal": "1",
+        "beskrivelse": "Bakterier, mikroalger, gær, svampe. Der kan styres efter temperatur, pH, opløst ilt, skum, mulighed for omrøring",
+        "kapacitet": "3 liter - 17 liter",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentor",
+        "antal": "4",
+        "beskrivelse": "Bakterier, mikroalger, gær, svampe, fager. Der kan styres efter temperatur, pH, opløst ilt, skum, mass flow controller (gas flow ind og mix af gas), mulighed for omrøring, mulighed for arbejde med GMO i laboratorie",
+        "kapacitet": "400 ml - 700 ml",
+        "atex": "Zone 2",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentor",
+        "antal": "1",
+        "beskrivelse": "Bakterier, mikroalger, gær, svampe, fager. Der kan styres efter temperatur, pH, opløst ilt, skum, mass flow controller (gas flow ind og mix af gas), mulighed for omrøring",
+        "kapacitet": "8 liter - 28 liter",
+        "atex": "Zone 2",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentor",
+        "antal": "1",
+        "beskrivelse": "Bakterier, mikroalger, gær, svampe, fager. Der kan styres efter temperatur, pH, opløst ilt, skum, mass flow controller (gas flow ind og mix af gas), mulighed for omrøring",
+        "kapacitet": "50 liter - 225 liter",
+        "atex": "Zone 2",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentor",
+        "antal": "1",
+        "beskrivelse": "Bakterier, mikroalger, gær, svampe, fager. Der kan styres efter temperatur, pH, opløst ilt, skum, mass flow controller (gas flow ind og mix af gas), mulighed for omrøring",
+        "kapacitet": "500 liter - 2250 liter",
+        "atex": "Zone 2",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fermentor",
+        "antal": "1",
+        "beskrivelse": "Bakterier, mikroalger, gær, svampe. Der kan styres efter temperatur, pH, opløst ilt, skum, mulighed for omrøring",
+        "kapacitet": "3 liter - 17 liter",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Centrifugering",
+        "antal": "2",
+        "beskrivelse": "Separering af let, tung og uopløselige faser",
+        "kapacitet": "20 - 3000 liter / time",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Homogenisator",
+        "antal": "1",
+        "beskrivelse": "minimum 20 liter, 1000 bar, 15 - 30C, Ceramisk",
+        "kapacitet": "80 liter / timen (justerbar)",
+        "atex": "",
+        "category": "Blanding & Homogenisering"
+      },
+      {
+        "service": "Mikrofiltering (MF)",
+        "antal": "3",
+        "beskrivelse": "Ceramisk / SANI / Labstak",
+        "kapacitet": "100 - 1000 liter / timen",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Ultrafiltrering (UF)",
+        "antal": "3",
+        "beskrivelse": "Ceramisk / SANI / Labstak",
+        "kapacitet": "100 - 1000 liter / timen",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Nanofiltrering (NF)",
+        "antal": "1",
+        "beskrivelse": "Labstak",
+        "kapacitet": "5 - 24 liter / min",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Omvendt osmose (RO)",
+        "antal": "1",
+        "beskrivelse": "Labstak",
+        "kapacitet": "5 - 24 liter / min",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Omrørertank",
+        "antal": "1",
+        "beskrivelse": "Holdetank",
+        "kapacitet": "100 liter",
+        "atex": "Zone 2",
+        "category": "Andet"
+      },
+      {
+        "service": "Omrørertank",
+        "antal": "3",
+        "beskrivelse": "Holdetank",
+        "kapacitet": "500 liter",
+        "atex": "Zone 2",
+        "category": "Andet"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "org": "Teknologisk Institut",
+    "name": "Downstream processing and spray drying, food grade",
+    "abbr": "TI",
+    "city": "Taastrup",
+    "address": "Gregersensvej 1, 2630 Taastrup",
+    "lat": 55.653056,
+    "lng": 12.298611,
+    "phone": "72202000",
+    "contact": "Anne Christine S. Hastrup, Director, Centerchef for Biosolutions Technology Center",
+    "mail": "Biotech@dti.dk; acha@dti.dk; ante@dti.dk",
+    "url": "https://www.teknologisk.dk/ydelser/laboratorie-og-pilotfaciliteter-biofermentering/45015",
+    "color": "#1e293b",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogo-medlemmer%2fTeknologisk+institut+300x150.jpg&width=300&format=webp",
+    "logoFallback": "TI",
+    "description": "Nyt dansk center for fødevare-fermentering etableres i Kalundborg kommune\nVi opbygger en komplet ”state of the art” industriel bio-fermenteringsfacilitet til fremstilling af nye fødevarer ved fermentering.\nVi skaber en dansk ”centre of excellence” teknologiplatform for viden og udvikling af bio-fermenteringsprocesser og -produktion.",
+    "trls": [
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 18,
+    "org": "Teknologisk Institut",
+    "name": "Biomaterial processing",
+    "abbr": "TI",
+    "city": "Taastrup",
+    "address": "Gregersensvej 1, 2630 Taastrup",
+    "lat": 55.653056,
+    "lng": 12.298611,
+    "phone": "72202000",
+    "contact": "Anne Christine S. Hastrup, Director, Centerchef for Biosolutions Technology Center",
+    "mail": "Biotech@dti.dk; acha@dti.dk; bdp@dti.dk",
+    "url": "https://www.teknologisk.dk/ydelser/biomaterialer/faa-en-sparringspartner-indenfor-biomaterialer/37309,2?cms.query=downstream",
+    "color": "#1e293b",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogo-medlemmer%2fTeknologisk+institut+300x150.jpg&width=300&format=webp",
+    "logoFallback": "TI",
+    "description": "Nyt dansk center for fødevare-fermentering etableres i Kalundborg kommune\nVi opbygger en komplet ”state of the art” industriel bio-fermenteringsfacilitet til fremstilling af nye fødevarer ved fermentering.\nVi skaber en dansk ”centre of excellence” teknologiplatform for viden og udvikling af bio-fermenteringsprocesser og -produktion.",
+    "trls": [
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 19,
+    "org": "Teknologisk Institut",
+    "name": "Biodegradability testing and documentation",
+    "abbr": "TI",
+    "city": "Taastrup",
+    "address": "Gregersensvej 1, 2630 Taastrup",
+    "lat": 55.653056,
+    "lng": 12.298611,
+    "phone": "72202000",
+    "contact": "Anne Christine S. Hastrup, Director, Centerchef for Biosolutions Technology Center",
+    "mail": "Biotech@dti.dk; acha@dti.dk; annr@dti.dk",
+    "url": "https://www.teknologisk.dk/ydelser/bionedbrydelighed-og-kompostering/42993",
+    "color": "#1e293b",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogo-medlemmer%2fTeknologisk+institut+300x150.jpg&width=300&format=webp",
+    "logoFallback": "TI",
+    "description": "Nyt dansk center for fødevare-fermentering etableres i Kalundborg kommune\nVi opbygger en komplet ”state of the art” industriel bio-fermenteringsfacilitet til fremstilling af nye fødevarer ved fermentering.\nVi skaber en dansk ”centre of excellence” teknologiplatform for viden og udvikling af bio-fermenteringsprocesser og -produktion.",
+    "trls": [
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 20,
+    "org": "Teknologisk Institut",
+    "name": "Microalgae pilot production (photobioreactors, heterotrophic production)",
+    "abbr": "TI",
+    "city": "Taastrup",
+    "address": "Gregersensvej 1, 2630 Taastrup",
+    "lat": 55.653056,
+    "lng": 12.298611,
+    "phone": "72202000",
+    "contact": "Anne Christine S. Hastrup, Director, Centerchef for Biosolutions Technology Center",
+    "mail": "Biotech@dti.dk; acha@dti.dk; prkr@dti.dk",
+    "url": "https://www.teknologisk.dk/ydelser/mikroalger-ekspertise/45001?cms.query=mikroalger",
+    "color": "#1e293b",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fLogo-medlemmer%2fTeknologisk+institut+300x150.jpg&width=300&format=webp",
+    "logoFallback": "TI",
+    "description": "Nyt dansk center for fødevare-fermentering etableres i Kalundborg kommune\nVi opbygger en komplet ”state of the art” industriel bio-fermenteringsfacilitet til fremstilling af nye fødevarer ved fermentering.\nVi skaber en dansk ”centre of excellence” teknologiplatform for viden og udvikling af bio-fermenteringsprocesser og -produktion.",
+    "trls": [
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 21,
+    "org": "University of Copenhagen, Department of Food Science",
+    "name": "Dairy and Processing",
+    "abbr": "KU",
+    "city": "Frederiksberg",
+    "address": "Rolighedsvej 26, 1958 Frederiksberg",
+    "lat": 55.678889,
+    "lng": 12.528056,
+    "phone": "35333794",
+    "contact": "Lilia Arhné, Professor",
+    "mail": "Biotech@dti.dk; acha@dti.dk; ante@dti.dk",
+    "url": "https://food.ku.dk/english/research_at_food/research-groups/dairy-and-processing/",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fKU.jpg&width=300&format=webp",
+    "logoFallback": "KU",
+    "description": "To meet the current and future needs of the Danish food industry, with a specific focus on dairy, the research activities focus on: (i) novel sustainable technologies to create sustainable, healthy and sensorial attractive products and ingredients by valorizing raw materials and side streams; (ii) use of digital technologies (e.g. models and sensors) to characterize, control and predict the process dynamics; (iii) combinations of materials and processing on the microstructure/functionality of the resulting product, and (iv) understanding molecular interactions, product functionality and bioactivity.\n\nResearch expertise:\nAdvancement of sustainable process technologies.\nData-driven, measurement-based strategies for process control and consistency product performance, including sustainability aspects as reduction of water consumption in plants.\nNovel technologies to produce more efficient dairy and food processes where side streams are minimized or valorized.\nDairy powder production and stability.\nDevelop higher throughput methodologies combined with models to design products and processes.\nEffect of processing and ingredients on dairy product properties, incl. minerals.\nFractionation technologies, e.g. pressure and electrically driven membrane processes.\nModels to understand microstructural transformations through the supply chain and consumer use.\nMolecular understanding of dairy products and ingredients bioactivity and functionality (e.g. structure and texture, gelling properties) and minerals in dairy and food products.\nSupport the development of sustainable products that facilitate export and reduce food waste.\n\nFacilities:\nDairy pilot plant (a variety of equipment for thermal treatment, filtration, homogenization, and production of yogurt, ice cream and cheese)\nSpray drying (GEA Mobile Minor and Buchi)\nSustainable process lab (pulsed electric fields, lab scale membrane filtration, high pressure homogenization, electrodialysis)\nPAT lab (vibrational spectroscopes – NIR, MIR, Raman, UVVis, Fluorescence) for off-line, at-line and on-line process monitoring and control; LF-NMR for relaxometry measurements)\nRheology lab (Kinexus Pro, TA DHR-2, Texture Analyzer TA.XTplusC)\nPhysical properties (Mastersizer 3000, Zetasizer Nano, Turbiscan)\nMinerals (ICP and electrochemistry)\nBioactivity assays\nHPLC and UPLC methods, e.g. for milk proteins and vitamin B12\nIn-vitro digestion models",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "UCPH FOOD is not approved for food production. However, we have food grade labs allowing to test eat the food produced in those labs.",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 22,
+    "org": "University of Copenhagen, Department of Food Science",
+    "name": "Food Design and Sustainability",
+    "abbr": "KU",
+    "city": "Frederiksberg",
+    "address": "Rolighedsvej 26, 1958 Frederiksberg",
+    "lat": 55.678889,
+    "lng": 12.528056,
+    "phone": "35323876",
+    "contact": "Marianne Thomsen, Professor",
+    "mail": "mth@food.ku.dk",
+    "url": "https://food.ku.dk/english/research_at_food/research-groups/food-design-and-sustainability/",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fKU.jpg&width=300&format=webp",
+    "logoFallback": "KU",
+    "description": "We advance the development of sustainable foods rooted in our understanding of the interplay between green chemistry principles, functionality and consumer accept. We exploit molecular principles and gastronomical potential for environmental and rational improvements of foods.  We work with the utilization of unexplored raw materials, novel ingredients and bioactive compounds in the design of health-improving functional foods. Lastly, we integrate environmental and nutritional life cycle assessment of innovative processes aiming at zero waste food supply value chains and the future nutrient rich foods based on the interplay between functionality and consumer accept.\n\nResearch expertise:\nFood processing/production (large scale (industrial) and small scale (kitchen))\nProduct innovation/prototyping\nNon-thermal/new technologies\nIn vitro protein digestibility (IVPD)\nProduct performance incl. instrumental and fast sensory methods\nLife Cycle Assessment (LCA)\nConsumer accept\nGastrophysics\n\nFacilities:\nGastronomic laboratories\nEvaluation laboratory\nTechnologies; High pressure equipment, Ultra sound equipment\nDifferential scanning calorimetry",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)",
+      "Demonstration (TRL 6-7)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "UCPH FOOD is not approved for food production. However, we have food grade labs allowing to test eat the food produced in those labs.",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 23,
+    "org": "University of Copenhagen, Department of Food Science",
+    "name": "Food Microbiology and Fermentation",
+    "abbr": "KU",
+    "city": "Frederiksberg",
+    "address": "Rolighedsvej 26, 1958 Frederiksberg",
+    "lat": 55.678889,
+    "lng": 12.528056,
+    "phone": "35333230",
+    "contact": "Lene Jespersen, Professor",
+    "mail": "lj@food.ku.dk",
+    "url": "https://food.ku.dk/english/research_at_food/research-groups/food-microbiology-and-fermentation/",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fKU.jpg&width=300&format=webp",
+    "logoFallback": "KU",
+    "description": "The overall aim of our research group is to exploit the full potential of food related microorganisms to transform various raw materials into delicious, nutritious, safe, and sustainable food products. To do so, we aim to get a detailed knowledge on the biodiversity, genomics and physiology of both pro- and eukaryotic microorganisms with main focus on bacteriophages, lactic acid bacteria, yeasts and moulds. A fundamental and mechanistic understanding of microbial interactions from the single cell level to the overall interactions with the food matrix is achieved to optimise food production and assist in solving new global challenges such as the transition to a more plant based diet.\n\nResearch expertise:\nFood and beverage fermentation\nDairy microbiology and biochemistry\nStarter culture development\nMicrobial food safety\nMicrobial spoilage\nYeast taxonomy and physiology\nLAB genomics\nBacteriophages\nSingle cell studies\nMicrobial interactions\nFermentation for nutritional improvement including pre-, pro- and postbiotics\n\nFacilities:\nBIOSTAT\niCinac\nBiolector 2\nSolid phase fermentation bioreactors (2x3.6 l), wet phase fermentation bioreactors (4x2 l)\nFlow cytometer (FACS)\nFluorescence microscopes\nUPLC/HPLC\nCell lab, TEER\nON rep seq\nqPCR, Fluidigm\nDairy pilot plant\nBrewing pilot plant\nClass I and II, GMO laboratories\nPulse Field Gel Electrophoresis\nCellAsic",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "UCPH FOOD is not approved for food production. However, we have food grade labs allowing to test eat the food produced in those labs.",
+    "gmo_approved": true,
+    "gmo_desc": "UCPH FOOD is approved to work with GMO in some of our microbiological laboratories. We have GMO class 1 and 2 labs. In short: we must work with all modified microorganisms, plants and food in our GMO labs.",
+    "services": []
+  },
+  {
+    "id": 24,
+    "org": "University of Copenhagen, Department of Food Science",
+    "name": "Food Proteins",
+    "abbr": "KU",
+    "city": "Frederiksberg",
+    "address": "Rolighedsvej 26, 1958 Frederiksberg",
+    "lat": 55.678889,
+    "lng": 12.528056,
+    "phone": "35333547",
+    "contact": "Marianne Nissen Lund, Professor",
+    "mail": "mnl@food.ku.dk",
+    "url": "https://food.ku.dk/english/research_at_food/research-groups/food_proteins_group/",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fKU.jpg&width=300&format=webp",
+    "logoFallback": "KU",
+    "description": "Our research vision is to enhance food quality by understanding complex chemical interactions between food components in sustainable food production, and to implement this knowledge in rational and healthy food design. We aim to develop an in-depth mechanistic understanding of complex interactions of food components, which will make it possible to predict, control, and modulate the chemical reactions taking place in food and beverages during production and storage. We have special emphasis on protein quality and protein modifications induced by Maillard reactions (i.e. protein glycation), oxidation, and reactions with polyphenols, and how these reactions affect flavour, protein structure and functionality, nutritional value and health.\n\nResearch expertise:\nUnderstand how processing and storage affect protein quality and induce protein modifications, including protein oxidation, Maillard reactions (protein glycation) and reactions with polyphenols (reactions between oxidized phenolics (i.e. quinones) and nucleophilic amino acid residues).\nDevelop and use state-of-the-art analytical methods to identify and quantify reactants, intermediates and products of protein modifications and other food components, both by chromatography-based methods and spectroscopy.\nObtain and use quantitative data and reaction kinetics to understand reaction mechanisms, determine major reaction routes and most significant modifications of food components.\nApply multivariate data analysis to understand the complex relationship between processing, storage and chemical reactions in foods and beverages.\nDevelop advanced chemometric tools to unravel information otherwise hidden in the large amount of data collected from our analytical methods.\nExploit the established chemical mechanisms to predict, control and modulate changes in food quality and functionality during production and storage.\nIn collaboration with our partners, determine absorption and uptake of the major modifications of food components occurring during production and storage in both cellular systems and animal models.\nIn collaboration with our partners, establish immunogenic and inflammatory responses in both cellular systems and animal models based on metabolic degradation of food components.\n\nFacilities:\n(Ultra) High performance liquid chromatography (HPLC/UHPLC) equipment with ultraviolet-visible (UV-Vis)/fluorescence detection\nLiquid chromatography tandem mass spectrometry (LC-MS/MS)\nSpectrophotometry (UV-Vis), including dark room for illumination experiments\nFluorescence spectroscopy, including time-resolved fluorescence and polarization\nMicrowave synthesis oven for protein hydrolysis\nGas chromatography with flame ionization detector (GC-FID)",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "UCPH FOOD is not approved for food production. However, we have food grade labs allowing to test eat the food produced in those labs.",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 25,
+    "org": "University of Copenhagen, Department of Food Science",
+    "name": "Foodomics",
+    "abbr": "KU",
+    "city": "Frederiksberg",
+    "address": "Rolighedsvej 26, 1958 Frederiksberg",
+    "lat": 55.678889,
+    "lng": 12.528056,
+    "phone": "35333205",
+    "contact": "Søren Balling Engelsen, Professor",
+    "mail": "se@food.ku.dk",
+    "url": "https://food.ku.dk/english/research_at_food/research-groups/foodomics/",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fKU.jpg&width=300&format=webp",
+    "logoFallback": "KU",
+    "description": "The aim of this research group is to obtain a better understanding of food quality and its impact on human health using metabolomics approaches. The FOODOMICS Laboratory focuses on examination of the entire set of substances present in our food (foodome) using advanced spectroscopic and chromatographic analytical platforms. Through rapid, untargeted, and unbiased screening, foodomics provides a detailed compositional overview of foods allowing the quality assessment, optimization of food production, and detection of food fraud and authenticity. The outcomes from foodomics have a direct impact on consumers, the food industry and society. \n\nResearch expertise:\nDigital Food Quality Control using rapid spectroscopic and advanced hyphenated chromatographic platforms with a focus on cereals, fruits, aquaculture, edible oil and beverages such as wine and beer\nOn-line Monitoring of Food Processes using robots and spectroscopic sensors, facilitating process analytical technology (PAT) to optimize sustainability of food production\nDigitalization of the food production including development of chemometric (multivariate data analysis) software for optimal information extraction of complex data streams acquired using advanced analytical platforms\nDetection of Food authenticity and fraud in raw materials, ingredients, and in food products\nFood processing kinetics including fermentation analytical technology\nIn-vitro digestibility of foods\nThe impact of food on human health using untargeted metabolomics of human blood, urine and fecal samples. Particular focus is on profiling of lipoprotein particle distribution in blood plasma using highly standardized proton NMR spectroscopy methods\nBioactive substances and anti-nutrients in food products and food raw materials\n\nFacilities:\nThe analytical platforms differ in their sensitivity and selectivity towards molecular classes as well as by their high-throughput capacity, but in combination, these platforms allow holistic evaluation of molecular composition of foods and plant food raw materials.\n\nNMR spectroscopy:\nBruker Avance TM 400 MHz NMR spectrometer equipped with HR-MAS and CP-MAS probes - analysis of solid and semi-solid samples\nBruker Avance™ III 500 MHz spectrometer  equipped with an automatic sample changer (sampleXpress, high throughput analysis of 60) - analysis of liquid samples\nBruker Avance™ III 600 MHz equipped with an automatic sample changer (SampleJet, high throughput analysis of 480 samples) - analysis of liquid samples\nBruker SamplePro -automated liquid sample preparation unit\nOxford Instruments Low field 20 MHz NMR with gas-controlled variable temperature probe  \n\nChromatography:\nAgilent GC-MS - single quadrupole MS based system equipped with a Single-Rail MultiPurpose Sampler (MPS) for automatic sample derivatization\nLECO GC-TOF-MS - HT Pegasus time-of-flight MS hyphenated with Agilent’s GC and equipped with a Dual-Rail MPS for automatic sample derivatization\nBruker GC-TQ – GC-MS system based on EVOQ Triple Quadrupole MS\nBruker Impact II QTOF – LC-MS system based on quadrupole/time-of-flight MS and Bruker Elute LC system equipped with auto-sampler with a cooling unit for >300 samples\nThermo LC-UV/VIS – UltiMate 3000 system equipped with automatic fraction collector unit for quantification and purification of compounds from mixtures\n\nVibrational spectroscopy:\nBruker NAME FT-IR / FT-Raman (1064 nm)\nFOSS DS2500 (400 – 2500 nm)\nBomen NAME FT-IR / FT-NIR\nKaiser Raman (785 nm) - Confocal Raman microscope with motorized XYZ stage and external macroscopic (FAT) probe\nTec5 dispersive CCD NIR (700-1900 nm)\nMicroNIR 1700ES Viavi (950-1650 nm)\n\nOther equipment:\nXT Plus Texture Analyzer, Stable Micro Systems Ltd\nChopin Mixolab 2\nPerten Falling Number\nPerten Glutomatic Gluten quantity and quality\nFibertec Insoluble and soluble dietary fiber\nSoxhlet Fat\nKjeltec Protein\nJEL Prüfsieb 200 sieving equipment\nThermo Scientific Process 11 Parallel Twin-Screw Extruder\nLaboratory for robotics (Universal Robots UR-5), automation and rapid prototyping using 3D printers",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "UCPH FOOD is not approved for food production. However, we have food grade labs allowing to test eat the food produced in those labs.",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 26,
+    "org": "University of Copenhagen, Department of Food Science",
+    "name": "Microbial Diversity and Function in Gut and Food",
+    "abbr": "KU",
+    "city": "Frederiksberg",
+    "address": "Rolighedsvej 26, 1958 Frederiksberg",
+    "lat": 55.678889,
+    "lng": 12.528056,
+    "phone": "35333287",
+    "contact": "Dennis Sandris Nielsen, Professor",
+    "mail": "dn@food.ku.dk",
+    "url": "https://food.ku.dk/english/research_at_food/research-groups/microbial-diversity-and-function-in-gut-and-food/",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fKU.jpg&width=300&format=webp",
+    "logoFallback": "KU",
+    "description": "We investigate microbial behavior in complex environments with particular focus on the mammalian gastrointestinal tract and fermented foods.\n\nOur group aims to understand\n1. How mammalian gut microbiome associates with health and disease and is influenced by diet, bacteriophages, pre- and probiotics\n2. How microbes interact with each other and the surrounding food matrix in particularly in plant-based and indigenous fermented foods. To this end, we use approaches ranging from cultivation-based methods to high-throughput sequencing based methods to in vivo and in vitro models. To extract knowledge from these data, we are developing bioinformatic tools and pipelines, and computational methods for data augmentation with adjacent layers of omics data.\n\nResearch expertise:\nFood fermentations with particular focus on microbe-microbe (e.g. bacteria-fungi) interactions and their influence on flavour, nutrients and structure of fermented (especially plant-based and indigenous) foods\nGut microbiome characterisation using high throughput Illumina and Oxford Nanopore sequencing platforms\nBacteriophages and their role in food and the mammalian gastrointestinal tract\nGut virome characterisation\nThe use of bacteriophages and complex viromes for manipulating microbial communities (e.g. in the mammalian gastrointestinal tract)\nData integration of omics data with production data, health/clinical data etc.\nHigh-throughput identification of microbes (bacteria, yeast and fungi) as well as anaerobic culturing and characterisation of bacteria, archaea and yeast\nDeveloping bioinformatic pipelines for Oxford Nanopore long-read sequencing data\nDeveloping in-house, novel protocols and end-to-end solutions for high-throughput assays using Oxford Nanopore Technologies and Illumina\nIn vitro methods for studying food/feed and microbial behavior during gastrointestinal passage and their influence on gut microbial communities\nThe use of in vivo models for gnotobiotic studies and microbiome/virome transfer studies\n\nFacilities:\nOxford Nanopore Technologies sequencing platforms (MinION, MinION Mk1C, GridION, PromethION P2)\nFluidigm Biomark, FlexSix (12 x 12), 48 x 48, 96 x 96 and 24 x 192\nqPCR Biorad CFX96 touch\nTapeStation (Agilent Technologies 4200)\nEquipment for handling obligate anaerobes and methanogens incl. anaerobic chamber (Don-Whitley) and high-throughput Hungate-based cultivation of obligate anaerobes\nAutomated DNA extraction (QIAcube, QIAGEN)\nEquipment for handling methanogens (/hydrogen)\nSmall intestine (TSI) and colon (CoMiniGut) in vitro models\nHigh Performance Computing, customized laboratory solution for real-time analysis of nanopore sequencing data\nAutomated handling of high-throughput sequencing (Flowbot one, Biomek 4000)\nControlled DNA fragmentation (Megaruptor ®2/Bioruptor® - Diagenode)\nBiostat - controlled fermentation systems (Sartorius)\nBeckman Coulter ultracentrifuge",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "UCPH FOOD is not approved for food production. However, we have food grade labs allowing to test eat the food produced in those labs.",
+    "gmo_approved": true,
+    "gmo_desc": "UCPH FOOD is approved to work with GMO in some of our microbiological laboratories. We have GMO class 1 and 2 labs. In short: we must work with all modified microorganisms, plants and food in our GMO labs.",
+    "services": []
+  },
+  {
+    "id": 27,
+    "org": "University of Copenhagen, Department of Food Science",
+    "name": "Molecular Food Science",
+    "abbr": "KU",
+    "city": "Frederiksberg",
+    "address": "Rolighedsvej 26, 1958 Frederiksberg",
+    "lat": 55.678889,
+    "lng": 12.528056,
+    "phone": "35333262",
+    "contact": "Mogens Larsen Andersen, Professor",
+    "mail": "mola@food.ku.dk",
+    "url": "https://food.ku.dk/english/research_at_food/research-groups/molecular-food-science/",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fKU.jpg&width=300&format=webp",
+    "logoFallback": "KU",
+    "description": "Foods are made up of molecules. Understanding the properties and stability of food requires the understanding of the chemistry and physics of mixtures of molecules. The Molecular Food Science research group use physical and chemical principles and methodologies to study and develop foods, beverages, and ingredients with new properties and an extended stability. This is based on a multiscale approach, where properties of ingredients and their interactions at a molecular level are sought to be linked to macroscopic food properties and quality as well as the generation of new food structures.\n\nResearch expertise:\nFood material science\nFood colloidal systems\nBrewing and beer chemistry\nStructural food physics and soft matter self-assembly\nOxidative stability of foods and beverages\nRadicals in foods and beverages\nUse of electron spin resonance spectroscopy (ESR) in food science\nSmall-angle x-ray (SAXS) and neutron scattering techniques and related advanced data analysis and modeling\nFood packaging\n\nFacilities:\nDynamic vapour sorption (DVS Intrinsic)\nESR-spectroscopy (Magnettech Miniscope MS-200 and MS-5000)\nSAXS/WAXS (Xenocs Nano-InXider)\nBeer analytical chemistry lab (Density, turbidity, O2, CO2, and foam stability)\nContact angle and surface tension (Dataphysics OCA25)\nParticle size and zeta potential (Malvern Zetasizer Nano ZSP)\nIsothermal titration calorimetry (TA Instruments NanoITC)\nStopped flow kinetics (Applied Photophysics)\nGas permeability of films and packaging materials (PBI Dansensor)\nGas analyzers and oxygen sensors",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "UCPH FOOD is not approved for food production. However, we have food grade labs allowing to test eat the food produced in those labs.",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 28,
+    "org": "University of Copenhagen, Department of Food Science",
+    "name": "Pilotbryggeri",
+    "abbr": "KU",
+    "city": "Frederiksberg",
+    "address": "Rolighedsvej 26, 1958 Frederiksberg",
+    "lat": 55.678889,
+    "lng": 12.528056,
+    "phone": "35325411",
+    "contact": "Kim Lou Johansen, Brygmester",
+    "mail": "kim.lou.johansen@food.ku.dk",
+    "url": "https://food.ku.dk/forskning-paa-food/forskningsomraader/brygvidenskab/\n\nhttps://food.ku.dk/english/infrastructure/brewery/",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fKU.jpg&width=300&format=webp",
+    "logoFallback": "KU",
+    "description": "Pilot-bryggeri (semi-industriel skala) Kaspar Schulz fra 2019 med en kapacitet på 50-100 l urt samt 10 temperaturkontrollerede (8-35 grader C) fermenteringstanke med en kapacitet på 40 l (8 stk) og 60 l (2 stk) øl eller juice (procesforståelse og produktion ifm forskning og undervisning i pilotskala af food grade bryggeriprodukter, herunder test af nye malt- og humlesorter, nye fermenteringsmetoder, nye ingredienser, herunder også nye smags- og aromakomponenter)\n\nForskningsekspertise:\nØlbrygning og ølkemi\nOxidation og smagsstabilitet I øl\nAromaprofil og frigivelse\n\nFaciliteter:\n2-valse maltmølle (Maltman 75)\nFire kedel pilotbryghus (Kaspar Schulz) – urtudslagsvolumen på 50-100 liter, inkl.\nTemperaturstyret mæskekedel\nSikar\nUrtkedel med ekstern koger og humle doseringsbeholder\nWhirlpool\nUrtkøler og beluftningsudstyr\nTemperaturstyrede gæringstanke: 8 * 40 liter, 2 * 60 liter and 1 * 30 liter (Speidel)\nEBC Kongres Mæskningsapparat med 8 * 200 ml mæskekar (Lochner)",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)",
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet",
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "UCPH FOOD is not approved for food production. However, we have food grade labs allowing to test eat the food produced in those labs.",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 29,
+    "org": "University of Copenhagen, Department of Food Science",
+    "name": "Pilotmejeri",
+    "abbr": "KU",
+    "city": "Frederiksberg",
+    "address": "Rolighedsvej 26, 1958 Frederiksberg",
+    "lat": 55.678889,
+    "lng": 12.528056,
+    "phone": "35333794",
+    "contact": "Lilia Arhné, Professor",
+    "mail": "lilia@food.ku.dk",
+    "url": "https://food.ku.dk/forskning-paa-food/forskningsomraader/mejeri-/",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fKU.jpg&width=300&format=webp",
+    "logoFallback": "KU",
+    "description": "Pilot-mejeri (semi-industriel skala) med alle enhedsoperationer som fx membranfiltrering/-opkoncentrering (1/2-20 l), centrifugering (10 l), to-fase dekanter (<1 kg), homogenisering (5-10 l/min), blanding (3-20 l), pasteurisering/varmebehandling (9x3 l, 20 l, kontinuerlig), ikke-termisk fødevarekonservering pulsed electric field (PEF 5-20 l), forsuring (9x3 l), koagulering (2x15 l, 4x60-150 l), tryk (2x4 hårde oste), tørring/modning (op til 40 kg), spraytørring (1-7 kg/t) (procesforståelse og produktion ifm forskning eller undervisning i pilotskala af food grade mejeriprodukter, herunder oste, fermenterede mælkeprodukter som yoghurt, skyr og is samt en lang række mælkeingredienser. Mange af enhedsoperationerne kan også udføres på planteekstrakter).\n\nMejeriforskningen på KU FOOD understøttes af vores meget veludviklede pilotanlæg, som sikrer, at næsten alle mejeriprodukter kan fremstilles i lille skala til de forskellige forskningsprojekter. Dette inkluderer blandt andet et splinternyt anlæg til membranfiltrering i lille skala. Derudover er udstyr til nye teknologier, såsom pulsed electric field og højtryksbehandling, tilgængelig.\n\nFOOD har også en stærk analytisk platform med omfattende udstyr til spektroskopi (NIR, IR og LF-NMR), GC-MS (metabolomics og aroma), proteinkarakterisering (CHNS, CE, HPLC, LCMS, SDS) og tekstur (reologi, teksturanalyse). Derudover har vi adgang til avanceret udstyr til mikroskopi (SEM, TEM, CLSM).",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)",
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet",
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "KU FOOD er ​​ikke godkendt til fødevareproduktion. Men vi har food grade laboratorier, der giver mulighed for at testspise den mad, der er produceret i disse laboratorier.",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 30,
+    "org": "University of Copenhagen, Department of Food Science",
+    "name": "Plant Based Foods and Biochemistry",
+    "abbr": "KU",
+    "city": "Frederiksberg",
+    "address": "Rolighedsvej 26, 1958 Frederiksberg",
+    "lat": 55.678889,
+    "lng": 12.528056,
+    "phone": "35333340",
+    "contact": "Poul Erik Jensen, Professor",
+    "mail": "peje@food.ku.dk",
+    "url": "https://food.ku.dk/english/research_at_food/research-groups/plant-based-foods-and-biochemistry/",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fKU.jpg&width=300&format=webp",
+    "logoFallback": "KU",
+    "description": "Our aim is to generate knowledge about functionality of the different food components and their interactions, in order to contribute basic understanding of food ingredients that can be translated into future strategies in food biotechnology. We work with food sources such as plants, microalgae, fungi, and various side streams. A major focus is molecular and structural characterization of proteins, interactions with other proteins and other components in the food matrix to assess the relation between protein composition, functionality and food quality. We are in particular interested in plant seed proteins, their quality in respect to amino acid content, in vitro digestibility, content of antinutrients and how processing of the seeds and proteins can affect these parameters.\n\nResearch expertise:\nBiochemical, physical and molecular characterization of food components.\nProtein biochemistry and protein quality.\nProteomics\nIn-vitro digestibility.\nAnti-nutritional compounds.\nFood microstructure and functionality.\nRheology and texture.\nAlgae and fungal fermentation.\nProcessing and fractionation of biological materials.\nEnzyme applications and bioengineering.\n\nFacilities:\nProteomics platform\nIVPD platform\nProtein purification\nProtein characterization and quantification\nFood grade facilities – lab and kitchen",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "UCPH FOOD is not approved for food production. However, we have food grade labs allowing to test eat the food produced in those labs.",
+    "gmo_approved": true,
+    "gmo_desc": "UCPH FOOD is approved to work with GMO in some of our microbiological laboratories. We have GMO class 1 and 2 labs. In short: we must work with all modified microorganisms, plants and food in our GMO labs.",
+    "services": []
+  },
+  {
+    "id": 31,
+    "org": "University of Copenhagen, Department of Food Science",
+    "name": "Sensory Science and Consumer Behaviour",
+    "abbr": "KU",
+    "city": "Frederiksberg",
+    "address": "Rolighedsvej 26, 1958 Frederiksberg",
+    "lat": 55.678889,
+    "lng": 12.528056,
+    "phone": "35333242",
+    "contact": "Quan Janice Wang, Associate Professor",
+    "mail": "qjw@food.ku.dk",
+    "url": "https://food.ku.dk/english/research_at_food/research-groups/sensory-science-and-consumer-behaviour/ \n\nhttps://futureconsumerlab.ku.dk/",
+    "color": "#dc2626",
+    "textColor": "#ffffff",
+    "logo": "https://www.foodbiocluster.dk/Admin/Public/GetImage.ashx?image=%2fFiles%2fImages%2fFBCD%2fLogoer-eksterne%2fKU.jpg&width=300&format=webp",
+    "logoFallback": "KU",
+    "description": "The group aims to improve the understanding of how people experience quality traits of foods by making use of the senses and how this process influences food preferences and behaviour. \n\nWe study sensory properties of foods and combine analytical sensory panels and advanced instrumental techniques. We also study food preferences and aversions in different consumer groups. We work with a variety of target groups including children, adults, elderly as well as patients and consumers with special needs.\n\nWe conduct studies on taste learning and changes of food behaviour, and thereby we go from product perception to product acceptance – or rejection. Our consumer research also addresses the importance of food contexts in preference judgements. We develop new data science tools and employ these to study the relationships between food composition, sensory perception and preferences.\n\nResearch expertise:\nAnalytical sensory food evaluation\nMouthfeel and oral processing\nFlavour chemistry\nData science\nConsumer food preferences\nConsumer choice behavior\nImmersive food contexts and perception\n\nFacilities:\nWe provide a variety of state-of-the-art equipment for instrumental and sensory analyses as well as laboratories for observation and analyses of consumer behavior.\nOur equipment and facilities our all part of what we call “Future Consumer lab”: https://futureconsumerlab.ku.dk/ \nWe have two trained sensory panels and consumer panel databases for various food research topics.\nWe also conduct field studies in nurseries, kindergartens, schools, and work places, or at consumers’ own homes.",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "UCPH FOOD is not approved for food production. However, we have food grade labs allowing to test eat the food produced in those labs.",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 32,
+    "org": "University of Southern Denmark",
+    "name": "Sensors and electronic noses for food freshness and processing",
+    "abbr": "SDU",
+    "city": "Sønderborg",
+    "address": "Alsion 2, 6400 Sønderborg",
+    "lat": 54.9125,
+    "lng": 9.785278,
+    "phone": "65501649",
+    "contact": "Roana de Oliveira Hansen",
+    "mail": "roana@mci.sdu.dk",
+    "url": "https://precisesensor.eu/",
+    "color": "#1e293b",
+    "textColor": "#ffffff",
+    "logo": "https://logo.clearbit.com/sdu.dk",
+    "logoFallback": "SDU",
+    "description": "Our expertise relies on developing electronic noses for various applications, including but not limited to \nfood freshness assessment. We have developed electronic noses to determine precise expiration dates of meat and \nfish, and we are also developing sensors to determine the freshness of fruits and vegetables.\nOur expertise can be applied to the development of sensor systems to analyse the process outcomes in food\nprocessing as well. We can either design a solution with commercial sensors and train them via machine learning\nto monitor certain processes, or we can develop customized sensors to detect specific analytes and biomarkers.\nWe have been helping companies to develop sensing solutions from idea to testing. We are able to test the sensors \nwith store bought food, but if necessary, we can get the permissions to work with other foods as well.",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)",
+      "Pilot (TRL 4-6)",
+      "Fuld (TRL 8)"
+    ],
+    "skalas": [
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": [
+      {
+        "service": "Gassammensætning og koncentration",
+        "antal": "",
+        "beskrivelse": "Customized sensing solutions for portable electronic noses",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Andet"
+      },
+      {
+        "service": "Datamodellering",
+        "antal": "",
+        "beskrivelse": "Training via machine learning of sensors to recognize biomarker/analyte levels",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Dataanalyse"
+      },
+      {
+        "service": "Datavisualisering",
+        "antal": "",
+        "beskrivelse": "Concrete data output based on data modelling",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Dataanalyse"
+      },
+      {
+        "service": "Statistik",
+        "antal": "",
+        "beskrivelse": "Database building based on collected data",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Dataanalyse"
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "org": "University of Southern Denmark",
+    "name": "Department of Green technology, Algae Synthetic Biology and Biotechnology Lab",
+    "abbr": "SDU",
+    "city": "Odense",
+    "address": "Moseskovvej 75, 5230 Odense",
+    "lat": 55.396111,
+    "lng": 10.388333,
+    "phone": "65508306",
+    "contact": "Michele Fabris",
+    "mail": "mif@igt.sdu.dk",
+    "url": "https://www.sdu.dk/en/forskning/biotechnology/researchareas/algae-synthetic-biology-and-molecular-biotechnology",
+    "color": "#1e293b",
+    "textColor": "#ffffff",
+    "logo": "https://logo.clearbit.com/sdu.dk",
+    "logoFallback": "SDU",
+    "description": "Nyt dansk center for fødevare-fermentering etableres i Kalundborg kommune\nVi opbygger en komplet ”state of the art” industriel bio-fermenteringsfacilitet til fremstilling af nye fødevarer ved fermentering.\nVi skaber en dansk ”centre of excellence” teknologiplatform for viden og udvikling af bio-fermenteringsprocesser og -produktion.",
+    "trls": [
+      "Pilot (TRL 4-6)",
+      "Demonstration (TRL 6-7)",
+      "Fuld (TRL 8)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": [
+      {
+        "service": "Autoclaving",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Analyse & Spektroskopi"
+      },
+      {
+        "service": "Centrifugation",
+        "antal": "2",
+        "beskrivelse": "",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Shake flasks",
+        "antal": "50",
+        "beskrivelse": "three shaking incubators",
+        "kapacitet": "10 Liters each",
+        "atex": "",
+        "category": "Fermentering"
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "org": "University of Southern Denmark",
+    "name": "Biomass Lab",
+    "abbr": "SDU",
+    "city": "Odense M",
+    "address": "Moseskovvej 75, 5230 Odense M",
+    "lat": 55.396111,
+    "lng": 10.388333,
+    "phone": "65504583",
+    "contact": "Work phone",
+    "mail": "muta@igt.sdu.dk",
+    "url": "https://www.sdu.dk/en/forskning/biotechnology",
+    "color": "#1e293b",
+    "textColor": "#ffffff",
+    "logo": "https://logo.clearbit.com/sdu.dk",
+    "logoFallback": "SDU",
+    "description": "The Biomass Lab is part of SDU Biotechnology. We have several collaborative projects in the area of biofuels and biochemical production. Specifically during the past three years we at Biomass Lab have been developing custom bioreactors for the biological conversion of CO2 to biomethane. These reactors are trickle bed reacotors equipped with thermal gas mass flow controller, pH and temperature data loggers, and persitaltic pumps for the trickling of liquid media. See this publication for more details (https://doi-org.proxy1-bib.sdu.dk/10.1016/j.bej.2021.108220). The second major acitivity we have is to develop fermenters for growing pure cultures. We have active projects in the lab to grow methanotrophs for bioplastic productions (https://inno-ccus.dk/project/biotechnology-for-converting-co2-to-platform-chemicals/).\n\nEquipment overview in the Biomass Lab: \n- A set of 4 semi-pilot trickle bed reactor for growing immbilized pure or mixed culture cells.\n- Two applikon 4 L fermenters with custom data loggers and controllers.\n- Gas chromatorgraphy to measure headspace gas composition.\nNote: The department has several of the analytical equiments, including HPLCs, GCs, and ICs. In house analytics can be provided.",
+    "trls": [
+      "Idé (TRL 1-2)",
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)"
+    ],
+    "skalas": [
+      "Testfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": []
+  },
+  {
+    "id": 35,
+    "org": "Zealand - Sjællands Erhversakademi/Zealand Academy of Technologies and Business",
+    "name": "PilotLab Zealand - Biosolutions pilot facilities",
+    "abbr": "Zealand",
+    "city": "Roskilde",
+    "address": "Maglegårdsvej 2, 4000 Roskilde",
+    "lat": 55.6358,
+    "lng": 12.0917,
+    "phone": "20968607/50762600",
+    "contact": "Daniel Fox (projektansvarlig)/Zealand hovednummer (spørg efter Daniel Fox i Roskilde)",
+    "mail": "pilotlab@zealand.dk",
+    "url": "https://www.zealand.dk/forskning-og-udvikling/pilot/",
+    "color": "#FFF387",
+    "textColor": "#1e293b",
+    "logo": "https://logo.clearbit.com/zealand.dk",
+    "logoFallback": "Zealand",
+    "description": "Vi åbner op for vores veludstyrede pilot anlæg (1-50 L) og inviterer iværksættere, ideholdere, studerende og erhvervsdrivende indenfor. I vores anlæg kan vi arbejde med fødevarer, fermentering og pulver teknologi. Hvis I har en ide, men mangler indledende test og proof-of-concept eller proof-of-process, kan vi hjælpe med den første opskalering fra laboratoriet til pilotanlægget. Vi kan også hjælpe hvis produktudviklingen er gået i stå grundet tekniske problemer, eller hvis jeres proces opfører sig anderledes end den burde og I er i tvivl om hvilken knap, der skal drejes på.  \nPå Zealand i Roskilde uddanner vi proces- og fødevareteknologer. Vi har et fuldt udstyret industrikøkken til de fødevaregale og fermenterings- og oprensningspilot anlæg med udstyr til både upstream og downstream processer. Udover at stille vores udstyr til rådighed kan vi også tilbyde sparring med vores kompetente undervisere samt vores hårdtarbejdende og kreative studerende. Hvis I mangler en (gratis) praktikant til et 20 ugers forløb, er dette også en oplagt mulighed. \nKonkret kan vi tilbyde hjælp til: \n-\tOpskalering\n-\tProduktudvikling\n-\tIndkøring af nyt udstyr/ny proces\n-\tOptimering af eksisterende processer\n\nWe are opening the doors to our well-equipped pilot facilities (1-50 L) and are inviting entrepreneurs, businesses, students and anyone with an idea inside. Our facilities are equipped to work with food, fermentation and powder technology. If you have an idea, but you need initial testing and proof-of-concept or proof-of-process, we can help with upscaling from lab to pilot scale. We can also help if product-development is stuck due to technical reasons, or if your process isn't behaving as it should and you don't know which button to turn. \nAt Zealand Roskilde we train process- and foodtechnologists. We have a fully equipped industrial kitchen, as well as fermentation and purification equipment for upstream and downstream processes at our disposal. Besides our equipment we also offer technical sparring with our competent educators and hardworking and creative students. It is also possible to arrange a (free) 20 week internship with one of our students at your facilities. \nWe offer help in the following areas: \n-\tUpscaling\n-\tProductdevelopment\n-\tProcessvalidation of new/existing equipment\n-\tOptimisation of existing processes",
+    "trls": [
+      "Screening (TRL 2-5)",
+      "Laboratorie (TRL 2-4)",
+      "Pilot (TRL 4-6)"
+    ],
+    "skalas": [
+      "Testfacilitet",
+      "Demonstrationsfacilitet",
+      "Udviklingsfacilitet"
+    ],
+    "food_approved": false,
+    "food_desc": "Vi er i proces med at blive fødevaregodkendt",
+    "gmo_approved": false,
+    "gmo_desc": "",
+    "services": [
+      {
+        "service": "Autoclaving",
+        "antal": "1",
+        "beskrivelse": "100 L autoclave with canning equipment",
+        "kapacitet": "100 L",
+        "atex": "",
+        "category": "Analyse & Spektroskopi"
+      },
+      {
+        "service": "Centrifugation",
+        "antal": "2",
+        "beskrivelse": "Disc bowl and solid bowl centrifuge",
+        "kapacitet": "Continuous/1-2 kg",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Destillation",
+        "antal": "1",
+        "beskrivelse": "20 L vacuum destillation unit",
+        "kapacitet": "20 L",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Fermentation",
+        "antal": "5",
+        "beskrivelse": "Glass and steel fermentors (sartorius)",
+        "kapacitet": "18-42 L",
+        "atex": "",
+        "category": "Fermentering"
+      },
+      {
+        "service": "Fluid bed dryer",
+        "antal": "3",
+        "beskrivelse": "Fluid bed",
+        "kapacitet": "0,1-5 kg",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Freeze drying",
+        "antal": "1",
+        "beskrivelse": "Freezedrying with 4 shelves",
+        "kapacitet": "0,5-1 kg",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Membrane filtration",
+        "antal": "1",
+        "beskrivelse": "Filterpress",
+        "kapacitet": "50-100 L",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Sieve shaker",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "2 mm - 250 microm",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Spray drying",
+        "antal": "1",
+        "beskrivelse": "Without heat exchanger",
+        "kapacitet": "",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Plate centrifuge",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "Continuous",
+        "atex": "",
+        "category": "Centrifugering"
+      },
+      {
+        "service": "Ultra filtration",
+        "antal": "1",
+        "beskrivelse": "",
+        "kapacitet": "Continuous",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Heat exchange",
+        "antal": "1",
+        "beskrivelse": "With pasteur, recovery and cooling side",
+        "kapacitet": "Continuous",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Heat process",
+        "antal": "2",
+        "beskrivelse": "Processtanks",
+        "kapacitet": "100 L",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Granulator",
+        "antal": "2",
+        "beskrivelse": "For powder production",
+        "kapacitet": "3-4 L chamber size",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Acid",
+        "antal": "1",
+        "beskrivelse": "Manual assembly of CIP unit",
+        "kapacitet": "100 L",
+        "atex": "",
+        "category": "Bioraffinering & Ekstraktion"
+      },
+      {
+        "service": "Lye",
+        "antal": "1",
+        "beskrivelse": "Manual assembly of CIP unit",
+        "kapacitet": "100 L",
+        "atex": "",
+        "category": "Bioraffinering & Ekstraktion"
+      },
+      {
+        "service": "Drying chamber",
+        "antal": "2",
+        "beskrivelse": "Humidity controlled drying chamber",
+        "kapacitet": "100 kg",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Extruder",
+        "antal": "1",
+        "beskrivelse": "For powder and tablet production",
+        "kapacitet": "1-2 kg/continuous",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Spheronizer",
+        "antal": "1",
+        "beskrivelse": "For powder and tablet production",
+        "kapacitet": "Continuous",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Oven",
+        "antal": "2",
+        "beskrivelse": "Professional kitchen (10 tray) konvektion/steam",
+        "kapacitet": "10 trays",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Smoke oven",
+        "antal": "1",
+        "beskrivelse": "Industrial size hot and cold smoking/baking",
+        "kapacitet": "20 large trays",
+        "atex": "",
+        "category": "Tørring"
+      },
+      {
+        "service": "Blastchiller",
+        "antal": "1",
+        "beskrivelse": "Køl/frys",
+        "kapacitet": "3-4 gastrotrays",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Vacuum/gas packer",
+        "antal": "1",
+        "beskrivelse": "For packaging",
+        "kapacitet": "5-10 L bags",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Hot fill machine",
+        "antal": "1",
+        "beskrivelse": "For hotfilling soups etc",
+        "kapacitet": "Continuous",
+        "atex": "",
+        "category": "Forarbejdning"
+      },
+      {
+        "service": "Sous-vide tank",
+        "antal": "2",
+        "beskrivelse": "Large waterbath",
+        "kapacitet": "50 kg",
+        "atex": "",
+        "category": "Varme & Fordampning"
+      },
+      {
+        "service": "Ion exchange chromatography",
+        "antal": "1",
+        "beskrivelse": "Äkta Pure with HiTrapQ column for FPLC",
+        "kapacitet": "25 mL/min",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Pilot scale chromatography",
+        "antal": "1",
+        "beskrivelse": "Bioprocess (Äkta)HPLC in pilot scale with 20 L column",
+        "kapacitet": "Large",
+        "atex": "",
+        "category": "Filtrering"
+      },
+      {
+        "service": "Micro filtration",
+        "antal": "1",
+        "beskrivelse": "Bench top filtration unit with various filter sizes",
+        "kapacitet": "4 L/continuous",
+        "atex": "",
+        "category": "Filtrering"
+      }
+    ]
+  }
+];
+
+const TRL_C = {
+  'Idé (TRL 1-2)':           '#6366f1',
+  'Screening (TRL 2-5)':     '#8b5cf6',
+  'Laboratorie (TRL 2-4)':   '#3b82f6',
+  'Pilot (TRL 4-6)':         '#0ea5e9',
+  'Demonstration (TRL 6-7)': '#10b981',
+  'Fuld (TRL 8)':            '#f59e0b',
+  'Kommerciel (TRL 9)':      '#ef4444',
+};
+
+// TRL EN labels
+const TRL_EN = {
+  'Idé (TRL 1-2)':           'Idea (TRL 1-2)',
+  'Screening (TRL 2-5)':     'Screening (TRL 2-5)',
+  'Laboratorie (TRL 2-4)':   'Laboratory (TRL 2-4)',
+  'Pilot (TRL 4-6)':         'Pilot (TRL 4-6)',
+  'Demonstration (TRL 6-7)': 'Demonstration (TRL 6-7)',
+  'Fuld (TRL 8)':            'Full scale (TRL 8)',
+  'Kommerciel (TRL 9)':      'Commercial (TRL 9)',
+};
+
+// Service category EN labels
+const CAT_EN = {
+  'Fermentering':              'Fermentation',
+  'Filtrering':                'Filtration',
+  'Tørring':                   'Drying',
+  'Centrifugering':            'Centrifugation',
+  'Blanding & Homogenisering': 'Blending & Homogenisation',
+  'Varme & Fordampning':       'Heat & Evaporation',
+  'Bioraffinering & Ekstraktion': 'Biorefining & Extraction',
+  'Analyse & Spektroskopi':    'Analysis & Spectroscopy',
+  'Dataanalyse':               'Data Analysis',
+  'Forarbejdning':             'Processing',
+  'Logistik & Infrastruktur':  'Logistics & Infrastructure',
+  'Andet':                     'Other',
+};
+
+// ── Language ──
+let LANG = 'da';
+function t(da, en) { return LANG === 'da' ? da : en; }
+function trl(name) { return LANG === 'da' ? name : (TRL_EN[name] || name); }
+function cat(name) { return LANG === 'da' ? name : (CAT_EN[name] || name); }
+
+function setLang(l) {
+  LANG = l;
+  document.getElementById('lang-da').classList.toggle('active', l==='da');
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  // Update static text
+  document.querySelectorAll('[data-da]').forEach(el => {
+    el.textContent = LANG==='da' ? el.dataset.da : el.dataset.en;
+    if (el.innerHTML.includes('&amp;')) el.innerHTML = LANG==='da' ? el.dataset.da : el.dataset.en;
+  });
+  document.querySelectorAll('input[data-placeholder-da]').forEach(el => {
+    el.placeholder = LANG==='da' ? el.dataset.placeholderDa : el.dataset.placeholderEn;
+  });
+  document.querySelectorAll('option[data-da]').forEach(el => {
+    el.textContent = LANG==='da' ? el.dataset.da : el.dataset.en;
+  });
+  document.getElementById('total-badge').textContent = `${FACILITIES.length} ${t('faciliteter','facilities')}`;
+  renderAll();
+  if (activeId) openDetail(activeId);
+}
+
+// ── Map ──
+const map = L.map('map',{center:[56.1,10.7],zoom:7});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+  attribution:'© <a href="https://www.openstreetmap.org/">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',maxZoom:19
+}).addTo(map);
+
+// ── State ──
+let searchQ='', cityF='', trlF=new Set(), svcCatF='';
+let activeId=null, markers={};
+
+// ── Cluster system: offset markers at same location ──
+function getOffsetCoords(facilities_list) {
+  // Group by rounded lat/lng (same city cluster)
+  const groups = {};
+  facilities_list.forEach(f => {
+    const key = `${Math.round(f.lat*100)/100},${Math.round(f.lng*100)/100}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(f);
+  });
+  // Assign spread offsets
+  const result = {};
+  Object.values(groups).forEach(group => {
+    const n = group.length;
+    group.forEach((f, i) => {
+      if (n === 1) {
+        result[f.id] = [f.lat, f.lng];
+      } else {
+        // Arrange in a spiral/grid pattern
+        const angle = (2 * Math.PI * i) / n;
+        const radius = 0.018 + (Math.floor(i/8) * 0.012);
+        result[f.id] = [
+          f.lat + radius * Math.cos(angle),
+          f.lng + radius * Math.sin(angle) * 1.6
+        ];
+      }
+    });
+  });
+  return result;
+}
+
+// ── Custom marker icon ──
+function makeIcon(color, abbr='', big=false) {
+  const s=big?20:13, b=big?3:2;
+  const glow = big ? `box-shadow:0 0 0 5px ${color}35;` : '';
+  const labelY = s + 3;
+  const labelHtml = abbr ? `<div style="position:absolute;top:${labelY}px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:800;color:#1e293b;white-space:nowrap;text-shadow:0 0 3px white,0 0 3px white,0 0 3px white,0 0 3px white,1px 1px 0 white,-1px -1px 0 white,1px -1px 0 white,-1px 1px 0 white;pointer-events:none;letter-spacing:0.3px">${abbr}</div>` : '';
+  return L.divIcon({
+    html:`<div style="position:relative;display:inline-block;width:${s}px;height:${s+18}px">
+      <div style="width:${s}px;height:${s}px;border-radius:50%;background:${color};border:${b}px solid white;${glow}transition:.15s"></div>
+      ${labelHtml}
+    </div>`,
+    className:'',iconSize:[s,s+18],iconAnchor:[s/2,s/2],popupAnchor:[0,-s/2-5]
+  });
+}
+
+// ── Logo HTML helper ──
+function logoImg(url, fallback, w=52, h=32) {
+  if (url) {
+    return `<img src="${url}" alt="${fallback}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" style="width:100%;height:100%;object-fit:contain">
+            <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:${Math.floor(w/6)}px;font-weight:800;color:#64748b">${fallback}</span>`;
+  }
+  return `<span style="font-size:${Math.floor(w/6)}px;font-weight:800;color:#64748b">${fallback}</span>`;
+}
+
+// ── Popup HTML ──
+function popupHtml(f) {
+  const trlHtml = (f.trls||[]).map(t => {
+    const c = TRL_C[t]||'#94a3b8';
+    return `<span class="pu-trl" style="background:${c}20;color:${c};border:1px solid ${c}40">${trl(t)}</span>`;
+  }).join('');
+  return `<div class="pu-bar" style="background:${f.color}"></div>
+  <div class="pu-body">
+    <div class="pu-logo-row">
+      <div class="pu-logo">${logoImg(f.logo, f.logoFallback)}</div>
+      <div>
+        <div class="pu-org">${f.org}</div>
+        <div class="pu-name">${f.name}</div>
+      </div>
+    </div>
+    ${trlHtml ? `<div class="pu-trls">${trlHtml}</div>` : ''}
+    <button class="pu-btn" onclick="openDetail(${f.id})">${t('Vis detaljer →','View details →')}</button>
+  </div>`;
+}
+
+// ── Hover tooltip ──
+let tooltipEl = null;
+function showTooltip(f, latlng) {
+  if (!tooltipEl) {
+    tooltipEl = document.createElement('div');
+    tooltipEl.className = 'map-tooltip';
+    tooltipEl.style.cssText = 'position:absolute;z-index:600;pointer-events:none;display:none';
+    document.querySelector('.map-wrap').appendChild(tooltipEl);
+  }
+  tooltipEl.innerHTML = `
+    <div class="tt-logo-row">
+      <div class="tt-logo" style="border-top:3px solid ${f.color}">${logoImg(f.logo, f.logoFallback)}</div>
+      <div>
+        <div class="tt-org">${f.org}</div>
+        <div class="tt-name">${f.name !== f.org ? f.name : ''}</div>
+      </div>
+    </div>
+    <div class="tt-city">📍 ${f.city}</div>`;
+  tooltipEl.style.display = 'block';
+}
+function hideTooltip() {
+  if (tooltipEl) tooltipEl.style.display = 'none';
+}
+function moveTooltip(e) {
+  if (!tooltipEl || tooltipEl.style.display==='none') return;
+  const wrap = document.querySelector('.map-wrap');
+  const rect = wrap.getBoundingClientRect();
+  let x = e.clientX - rect.left + 14;
+  let y = e.clientY - rect.top + 14;
+  if (x + 270 > rect.width) x -= 280;
+  if (y + 120 > rect.height) y -= 130;
+  tooltipEl.style.left = x + 'px';
+  tooltipEl.style.top  = y + 'px';
+}
+document.querySelector('.map-wrap').addEventListener('mousemove', moveTooltip);
+
+// ── Filtering ──
+function filtered() {
+  const q = searchQ.toLowerCase();
+  return FACILITIES.filter(f => {
+    const svcNames = (f.services||[]).map(s=>s.service.toLowerCase());
+    const svcCats  = (f.services||[]).map(s=>(s.category||'').toLowerCase());
+    return (!cityF   || f.city===cityF)
+        && (!q       || [f.name,f.org,f.city,f.contact,f.description,...svcNames].join(' ').toLowerCase().includes(q))
+        && (trlF.size===0 || (f.trls||[]).some(tr=>trlF.has(tr)))
+        && (!svcCatF || svcCats.includes(svcCatF.toLowerCase()));
+  });
+}
+
+// ── Render markers ──
+function renderMarkers() {
+  Object.values(markers).forEach(m=>map.removeLayer(m));
+  markers = {};
+  const list = filtered();
+  const coords = getOffsetCoords(list);
+
+  list.forEach(f => {
+    const [lat, lng] = coords[f.id] || [f.lat, f.lng];
+    const m = L.marker([lat, lng], {icon: makeIcon(f.color, f.id===activeId)});
+    m.bindPopup(popupHtml(f), {maxWidth:300});
+
+    m.on('mouseover', function(e) { showTooltip(f, e.latlng); });
+    m.on('mouseout',  function()  { hideTooltip(); });
+    m.on('click',     function()  { hideTooltip(); highlightCard(f.id); });
+
+    m.addTo(map);
+    markers[f.id] = m;
+  });
+}
+
+// ── Render list ──
+function renderList() {
+  const list = filtered();
+  document.getElementById('rinfo').textContent = `${t('Viser','Showing')} ${list.length} ${t('af','of')} ${FACILITIES.length} ${t('faciliteter','facilities')}`;
+  const el = document.getElementById('flist');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty">🔍<br>${t('Ingen resultater matcher filteret','No results match the filter')}</div>`;
+    return;
+  }
+  el.innerHTML = list.map(f => {
+    const pills = (f.trls||[]).slice(0,3).map(tr => {
+      const c = TRL_C[tr]||'#94a3b8';
+      return `<span class="fc-tpill" style="color:${c};border-color:${c}40;background:${c}12">${trl(tr)}</span>`;
+    }).join('');
+    return `<div class="fcard${f.id===activeId?' active':''}" id="card-${f.id}" onclick="cardClick(${f.id})">
+      <div class="fc-row1">
+        <div class="fc-logo">${logoImg(f.logo, f.logoFallback)}</div>
+        <div class="fc-right">
+          <div class="fc-org" style="color:${f.textColor || f.color};background:${f.color};padding:2px 6px;border-radius:4px">${f.org}</div>
+          <div class="fc-name">${f.name !== f.org ? f.name : ''}</div>
+        </div>
+      </div>
+      <div class="fc-bottom">
+        <span class="fc-city">📍 ${f.city}</span>
+        ${pills}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Card click ──
+function cardClick(id) {
+  highlightCard(id);
+  const f = FACILITIES.find(x=>x.id===id);
+  if (f) { map.setView([f.lat,f.lng],Math.max(map.getZoom(),12),{animate:true}); if(markers[id]) markers[id].openPopup(); }
+}
+
+function highlightCard(id) {
+  if (activeId) {
+    const pf = FACILITIES.find(x=>x.id===activeId);
+    if (pf && markers[activeId]) markers[activeId].setIcon(makeIcon(pf.color, pf.abbr || pf.org.substring(0,3), false));
+    const pc = document.getElementById(`card-${activeId}`); if(pc) pc.classList.remove('active');
+  }
+  activeId = id;
+  const f = FACILITIES.find(x=>x.id===id);
+  if (f && markers[id]) markers[id].setIcon(makeIcon(f.color, f.abbr || f.org.substring(0,3), true));
+  const card = document.getElementById(`card-${id}`);
+  if (card) { card.classList.add('active'); card.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+
+// ── Detail panel ──
+function openDetail(id) {
+  const f = FACILITIES.find(x=>x.id===id);
+  if (!f) return;
+  highlightCard(id);
+
+  // Header
+  document.getElementById('dp-header').innerHTML = `
+    <button class="dp-close" onclick="closeDetail()">✕</button>
+    <div class="dp-logo-row">
+      <div class="dp-logo" style="border-top:3px solid ${f.color}">${logoImg(f.logo, f.logoFallback, 72, 44)}</div>
+      <div>
+        <div class="dp-org-name" style="color:${f.textColor || '#fff'};background:${f.color};padding:4px 8px;border-radius:6px;display:inline-block">${f.org}</div>
+        <div class="dp-fac-name">${f.name !== f.org ? f.name : ''}</div>
+      </div>
+    </div>
+    <div class="dp-meta-row">
+      <span class="dp-badge" style="background:${f.color}15;color:${f.color}">📍 ${f.city}</span>
+      ${(f.skalas||[]).map(s=>`<span class="dp-badge" style="background:#f1f5f9;color:#475569">${s}</span>`).join('')}
+    </div>`;
+
+  // Body
+  let html = '';
+
+  // Description
+  if (f.description) {
+    html += `<div class="dps"><div class="dps-title">📄 ${t('Beskrivelse','Description')}</div>
+      <div class="dps-desc">${f.description}</div></div>`;
+  }
+
+  // TRL
+  if ((f.trls||[]).length) {
+    const chips = f.trls.map(tr => {
+      const c = TRL_C[tr]||'#94a3b8';
+      return `<span class="trl-chip" style="color:${c};border-color:${c};background:${c}12">${trl(tr)}</span>`;
+    }).join('');
+    html += `<div class="dps"><div class="dps-title">🎯 ${t('TRL-niveau','TRL Level')}</div>
+      <div class="trl-grid">${chips}</div></div>`;
+  }
+
+  // Services grouped by category
+  if ((f.services||[]).length) {
+    const grouped = {};
+    (f.services||[]).forEach(s => {
+      const c = s.category || t('Andet','Other');
+      if (!grouped[c]) grouped[c] = [];
+      grouped[c].push(s);
+    });
+
+    let svcHtml = Object.entries(grouped).map(([catName, svcs]) => {
+      const rows = svcs.map(s => `
+        <tr>
+          <td><strong>${s.service}</strong>${s.beskrivelse?`<br><span style="color:var(--muted);font-size:10px">${s.beskrivelse}</span>`:''}</td>
+          <td style="color:var(--muted);white-space:nowrap">${s.antal||'–'}</td>
+          <td style="white-space:nowrap">${s.kapacitet||'–'}</td>
+          <td>${s.atex?`<span class="atex-badge">ATEX</span>`:''}</td>
+        </tr>`).join('');
+      return `<div class="svc-group">
+        <div class="svc-group-title">${cat(catName)}</div>
+        <table class="svc-table">
+          <thead><tr>
+            <th>${t('Service','Service')}</th>
+            <th>${t('Antal','Units')}</th>
+            <th>${t('Kapacitet','Capacity')}</th>
+            <th></th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+    }).join('');
+    html += `<div class="dps"><div class="dps-title">⚙️ ${t('Services & Kapacitet','Services & Capacity')}</div>${svcHtml}</div>`;
+  }
+
+  // Approvals
+  const foodBadge = f.food_approved ? `<span class="ap-yes">✓ ${t('Fødevaregodkendt','Food approved')}</span>` : '';
+  const gmoBadge  = f.gmo_approved  ? `<span class="ap-yes">✓ ${t('GMO-godkendt','GMO approved')}</span>`  : '';
+  if (foodBadge || gmoBadge || f.food_desc || f.gmo_desc) {
+    html += `<div class="dps"><div class="dps-title">🏷️ ${t('Godkendelser','Certifications')}</div>
+      <div class="ap-row">${foodBadge}${gmoBadge}</div>
+      ${f.food_desc?`<div class="ap-note">${t('Fødevarer','Food')}: ${f.food_desc}</div>`:''}
+      ${f.gmo_desc ?`<div class="ap-note">GMO: ${f.gmo_desc}</div>`:''}
+    </div>`;
+  }
+
+  // Contact
+  const mailHtml = f.mail ? f.mail.split(';').map(m=>`<a href="mailto:${m.trim()}">${m.trim()}</a>`).join('<br>') : '';
+  const urlHtml  = f.url && f.url.startsWith('http') ? `<a href="${f.url}" target="_blank">${f.url.replace(/^https?:\/\//,'').split('/')[0]}</a>` : '';
+  html += `<div class="dps"><div class="dps-title">📬 ${t('Kontakt','Contact')}</div>
+    <div class="cg">
+      ${f.address?`<div class="crow"><span class="ci">📍</span>${f.address}</div>`:''}
+      ${f.phone  ?`<div class="crow"><span class="ci">📞</span>${f.phone}</div>`:''}
+      ${f.contact?`<div class="crow"><span class="ci">👤</span>${f.contact}</div>`:''}
+      ${mailHtml ?`<div class="crow"><span class="ci">✉️</span>${mailHtml}</div>`:''}
+      ${urlHtml  ?`<div class="crow"><span class="ci">🔗</span>${urlHtml}</div>`:''}
+    </div></div>`;
+
+  document.getElementById('dp-body').innerHTML = html;
+  document.getElementById('dp').classList.add('open');
+  map.setView([f.lat,f.lng],Math.max(map.getZoom(),12),{animate:true});
+}
+
+function closeDetail() {
+  document.getElementById('dp').classList.remove('open');
+  if (activeId) {
+    const f = FACILITIES.find(x=>x.id===activeId);
+    if (f&&markers[activeId]) markers[activeId].setIcon(makeIcon(f.color,false));
+    const c = document.getElementById(`card-${activeId}`); if(c) c.classList.remove('active');
+    activeId = null; renderList();
+  }
+}
+
+// ── TRL chips ──
+function buildTrlChips() {
+  document.getElementById('trl-chips').innerHTML = Object.entries(TRL_C).map(([name,c]) => {
+    const on = trlF.has(name);
+    return `<div class="chip${on?' on':''}" style="color:${on?c:'var(--muted)'}" onclick="toggleTrl('${name}')">
+      <span class="cdot" style="background:${on?c:'#cbd5e1'}"></span>${trl(name)}</div>`;
+  }).join('');
+}
+
+function toggleTrl(name) {
+  trlF.has(name) ? trlF.delete(name) : trlF.add(name);
+  renderAll();
+}
+
+// ── Populate selects ──
+function populateCities() {
+  const sel = document.getElementById('city-filter');
+  const cities = [...new Set(FACILITIES.map(f=>f.city))].sort();
+  cities.forEach(c => {
+    const o = document.createElement('option');
+    o.value=c; o.textContent=c; sel.appendChild(o);
+  });
+}
+
+function populateSvcCats() {
+  const all = new Set();
+  FACILITIES.forEach(f=>(f.services||[]).forEach(s=>{ if(s.category) all.add(s.category); }));
+  const sel = document.getElementById('svc-cat-filter');
+  // Add grouped options
+  [...all].sort().forEach(c => {
+    const o = document.createElement('option');
+    o.value=c; o.dataset.da=c; o.dataset.en=CAT_EN[c]||c;
+    o.textContent = LANG==='da' ? c : (CAT_EN[c]||c);
+    sel.appendChild(o);
+  });
+}
+
+// ── Legend ──
+function buildLegend() {
+  const seen = {}; FACILITIES.forEach(f=>{ seen[f.orgLabel]=f.color; });
+  document.getElementById('legend').innerHTML = `<div class="lt">${t('Organisation','Organisation')}</div>`
+    + Object.entries(seen).sort().map(([l,c])=>`<div class="li"><div class="ldot" style="background:${c}"></div>${l}</div>`).join('');
+}
+
+// ── Events ──
+document.getElementById('search').addEventListener('input', e=>{searchQ=e.target.value;renderAll();});
+document.getElementById('city-filter').addEventListener('change', e=>{cityF=e.target.value;renderAll();});
+document.getElementById('svc-cat-filter').addEventListener('change', e=>{svcCatF=e.target.value;renderAll();});
+
+// ── Render all ──
+function renderAll() { buildTrlChips(); renderList(); renderMarkers(); buildLegend(); }
+
+// ── Init ──
+populateCities();
+populateSvcCats();
+renderAll();
+</script>
+</body>
+</html>
